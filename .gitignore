@@ -1,3 +1,6 @@
+# Ignore directories
 static/*
 .vagrant/*
+.idea/*
 Vagrantfile
+ubuntu-xenial-16.04-cloudimg-console
