@@ -9,6 +9,13 @@ from django.contrib.auth.models import User
 
 
 class ConnexionForm(ModelForm):
+    email = forms.CharField(label="email", max_length=150,
+                               widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
+                                                             'placeholder': 'Email'}))
+    password = forms.CharField(label="password", max_length=30,
+                               widget=forms.PasswordInput(attrs={'class': 'form-control', 'name': 'password',
+                                                                 'placeholder': 'Mot de passe'}))
+
     class Meta:
         model = User
-        fields = ('email','password')
+        fields = ('email', 'password')
