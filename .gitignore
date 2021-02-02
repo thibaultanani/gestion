@@ -7,3 +7,4 @@ ubuntu-xenial-16.04-cloudimg-console
 __pycache__/*
 gestion/__pycache__/*
 listes/__pycache__/*
+listes/migrations/*
