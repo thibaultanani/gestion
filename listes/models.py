@@ -4,19 +4,13 @@ from django.utils import timezone
 
 # Create your models here.
 import datetime
+from django.contrib.auth.models import User
 
 
-class Utilisateur(models.Model):
-    mdp = models.CharField(max_length=100)
-    nom = models.CharField(max_length=100)
-    prenom = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
-
-    class Meta:
-        abstract = True
 
 
-class Admnistrateur(Utilisateur):
+class Admnistrateur(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,default=None)
     poste = models.CharField(max_length=100)
 
     def __str__(self):
@@ -30,7 +24,8 @@ class Titre(models.TextChoices):
     tuteur = 'Tuteur'
 
 
-class Professeur(Utilisateur):
+class Professeur(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,default=None)
     titre = models.CharField(max_length=100, choices=Titre.choices)
 
     def __str__(self):

@@ -1,7 +1,10 @@
 from django.conf.urls import url
 from . import views
+from django.contrib.auth import views as auth_views
+from .forms import  ConnexionForm
 
 urlpatterns = [
-    url(r'^$', views.login, name='login'),
-    url(r'^$', views.index, name='index'),
+
+    url(r'^index/', views.index, name='index'),
+    url(r'^', views.connexion, name='connexion')
 ]
