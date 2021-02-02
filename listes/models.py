@@ -7,19 +7,19 @@ import datetime
 from django.utils import timezone
 
 class Utilisateur(models.Model):
-   mdp = models.CharField(max_length=100)
-   nom = models.CharField(max_length=100)
-   prenom = models.CharField(max_length=100)
-   email = models.EmailField(max_length=100)
+    mdp = models.CharField(max_length=100)
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100)
 
-   class Meta:
+    class Meta:
        abstract = True
 
 class Admnistrateur(Utilisateur):
-   poste = models.CharField(max_length=100)
+    poste = models.CharField(max_length=100)
 
 
-   def __str__(self):
+    def __str__(self):
        return self.poste
 
 
@@ -29,8 +29,8 @@ class Titre(models.TextChoices):
     prof_des_universites = 'Professeur des universités',
     tuteur = 'Tuteur'
 class Professeur(Utilisateur):
-   titre = models.CharField(max_length=100,choices=Titre.choices)
-   def __str__(self):
+    titre = models.CharField(max_length=100,choices=Titre.choices)
+    def __str__(self):
        return self.titre
 
 
