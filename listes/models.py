@@ -1,32 +1,38 @@
 from django.db import models
 from django_mysql.models import ListCharField
 
+
 # Create your models here.
 import datetime
 from django.utils import timezone
 
-class Question(models.Model):
-   question_text = models.CharField(max_length=200)
-   pub_date = models.DateTimeField('date published')
+class Utilisateur(models.Model):
+   mdp = models.CharField(max_length=100)
+   nom = models.CharField(max_length=100)
+   prenom = models.CharField(max_length=100)
+   email = models.EmailField(max_length=100)
+
+   class Meta:
+       abstract = True
+
+class Admnistrateur(Utilisateur):
+   poste = models.CharField(max_length=100)
+
 
    def __str__(self):
-       return self.question_text
+       return self.poste
 
-   def was_published_recently(self):
-       now = timezone.now()
-       return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
-   was_published_recently.admin_order_field = 'pub_date'
-   was_published_recently.boolean = True
-   was_published_recently.short_description = 'Published recently?'
+class Titre(models.TextChoices):
+    doctorant= 'Doctorant',
+    maitre_de_conferences = 'Maître de conférences',
+    prof_des_universites = 'Professeur des universités',
+    tuteur = 'Tuteur'
+class Professeur(Utilisateur):
+   titre = models.CharField(max_length=100,choices=Titre.choices)
+   def __str__(self):
+       return self.titre
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING,)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.choice_text
 
 class Ufr(models.Model):
     nom = models.CharField(max_length=100)
