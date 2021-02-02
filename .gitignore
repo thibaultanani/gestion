@@ -1,5 +1,5 @@
 # Ignore directories
-static/*
+static/node_modules/*
 .vagrant/*
 .idea/*
 Vagrantfile
