@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% load i18n %}
 {% load static %}
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,16 +19,16 @@
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
-    <a href="../../index2.html"><b>Admin</b>LTE</a>
+    <b>Gestion de listes</b>
   </div>
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">Sign in to start your session</p>
+      <p class="login-box-msg">Connectez-vous pour commencer votre session</p>
 
       <form method="post">
           {% csrf_token %}
-        <div class="input-group mb-3">
+        <div class="input-group mb-4">
             {{ form.email }}
           <div class="input-group-append">
             <div class="input-group-text">
@@ -36,7 +36,7 @@
             </div>
           </div>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group mb-4">
             {{ form.password }}
           <div class="input-group-append">
             <div class="input-group-text">
@@ -46,8 +46,8 @@
         </div>
         <div class="row">
           <!-- /.col -->
-          <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+          <div class="col-5">
+            <button type="submit" class="btn btn-primary btn-block">Connexion</button>
           </div>
           <!-- /.col -->
         </div>
