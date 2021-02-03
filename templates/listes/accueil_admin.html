@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<h1>Bonjour {{ user.first_name }} {{ user.last_name }}</h1>
+
+<button>
+    <a href="{% url 'admin_cours' %}">Cours</a>
+</button>
+<button>
+    <a href="{% url 'admin_etudiant' %}">Etudiants</a>
+</button>
+<button>
+    <a href="{% url 'admin_professeur' %}">Professeurs</a>
+</button>
