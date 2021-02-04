@@ -9,3 +9,4 @@ __pycache__/*
 gestion/__pycache__/*
 listes/__pycache__/*
 listes/migrations/*
+db.sqlite3

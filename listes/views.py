@@ -46,7 +46,24 @@ def admin_cours(request):
 def admin_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
     print("HELLO")
-    return render(request, 'listes/admin_professeur.html', {'user': user})
+    professeur_all = Professeur.objects.all().values()
+    print(professeur_all)
+    print(list(professeur_all))
+    print(professeur_all[0])
+    client_obj = User.objects.get(id=professeur_all[0]["user_id"])
+    print(client_obj)
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+
+    print(listProfesseur)
+
+    return render(request, 'listes/admin_professeur.html', {'user': user, "data": list(professeur_all)})
 
 
 def admin_etudiant(request):
