@@ -17,16 +17,24 @@ class Admnistrateur(models.Model):
         return self.poste
 
 
-class Titre(models.TextChoices):
-    doctorant= 'Doctorant',
-    maitre_de_conferences = 'Maître de conférences',
-    prof_des_universites = 'Professeur des universités',
-    tuteur = 'Tuteur'
-
-
 class Professeur(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,default=None)
-    titre = models.CharField(max_length=100, choices=Titre.choices)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, default=None)
+
+    DOCTORANT = 'Doctorant'
+    MAITRES_DE_CONFERENCES = 'Maître de conférences'
+    PROF_DES_UNIVERSITES = 'Professeur des universités'
+    TUTEUR = 'Tuteur'
+    AUCUN = 'Aucun'
+
+    titre_choix = (
+        (DOCTORANT, 'Doctorant'),
+        (MAITRES_DE_CONFERENCES, 'Maître de conférences'),
+        (PROF_DES_UNIVERSITES, 'Professeur des universités'),
+        (TUTEUR, 'Tuteur'),
+        (AUCUN, 'Aucun'),
+    )
+
+    titre = models.CharField(max_length=100, choices=titre_choix, default=AUCUN)
 
     def __str__(self):
         return self.titre
@@ -86,7 +94,6 @@ class Type(models.TextChoices):
 class Cours(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
     niveaux = ListCharField(
         base_field=models.CharField(
             max_length=10,

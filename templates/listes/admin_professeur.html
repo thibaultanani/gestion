@@ -6,5 +6,8 @@
 </head>
 <body>
     <h1>Admin Professeur !</h1>
+    {{ user.first_name }}
+    {{ user.last_name }}
+    <a href="{% url 'gestion_professeur' user.id %}">Ajouter prof</a>
 </body>
 </html>
