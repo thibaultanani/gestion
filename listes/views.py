@@ -24,7 +24,7 @@ def connexion(request):
 
                 if user is not None and user.is_active:
                     login(request, user)
-                    return render(request, 'listes/accueil_admin.html', {'user_object': user_object})
+                    return render(request, 'listes/accueil_professeur.html', {'user_object': user_object})
             except:
                 render(request, 'listes/login.html', {'form': form})
     else:
@@ -37,6 +37,24 @@ def accueil_admin(request, user_object):
     user = get_object_or_404(User, id=user_object.id)
     print(user.first_name)
     return render(request, 'listes/accueil_admin.html', {'user', user})
+
+
+def accueil_professeur(request, user_object):
+    user = get_object_or_404(User, id=user_object.id)
+    print(user.first_name)
+    return render(request, 'listes/accueil_professeur.html', {'user', user})
+
+
+def prof_liste_etudiant(request):
+    return render(request, 'listes/prof_liste_etudiant.html')
+
+
+def prof_cursus_etudiant(request):
+    return render(request, 'listes/prof_cursus_etudiant.html')
+
+
+def modif_mdp(request):
+    return render(request, 'listes/modif_mdp.html')
 
 
 def admin_cours(request):
