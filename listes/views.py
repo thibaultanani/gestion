@@ -6,7 +6,9 @@ from .forms import *
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from django.contrib import messages
+from .models import *
 
 
 def connexion(request):
@@ -20,11 +22,16 @@ def connexion(request):
                 user_object = User.objects.get(email=email.lower())
 
                 print(username)
+                print (password)
                 user = authenticate(username=username, password=password)
-
+                print(user)
                 if user is not None and user.is_active:
+                    print("tessssst")
                     login(request, user)
-                    return render(request, 'listes/accueil_admin.html', {'user_object': user_object})
+                    if Admnistrateur.objects.filter(user_id=user_object.pk).exists():
+                        return render(request, 'listes/accueil_admin.html', {'user_object': user_object})
+                    if Professeur.objects.filter(user_id=user_object.pk).exists():
+                        return render(request, 'listes/accueil_professeur.html', {'user_object': user_object})
             except:
                 render(request, 'listes/login.html', {'form': form})
     else:
@@ -37,6 +44,12 @@ def accueil_admin(request, user_object):
     user = get_object_or_404(User, id=user_object.id)
     print(user.first_name)
     return render(request, 'listes/accueil_admin.html', {'user', user})
+
+@login_required(login_url="/connexion")
+def accueil_professeur(request, user_object):
+    user = get_object_or_404(User, id=user_object.id)
+    print(user.first_name)
+    return render(request, 'listes/accueil_professeur.html', {'user', user})
 
 
 def admin_cours(request):
@@ -63,9 +76,10 @@ def gestion_professeur(request, user_id):
             nom = request.POST.get('nom', False)
             email = request.POST.get('email', False)
             titre = request.POST.get('titre', False)
+            password=make_password('test1234')
 
             utilisateur = User(first_name=prenom, last_name=nom, email=email,
-                               username=email, password='test1234')
+                               username=email, password=password)
             utilisateur.is_active = True
             utilisateur.save()
 
