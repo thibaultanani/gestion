@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Cours !</title>
+    <title>Gestion des cours (admin)</title>
 </head>
 <body>
-    <h1>Admin Cours !</h1>
+    <h1>Liste des cours </h1>
+    <button type="button"><a href="{% url 'admin_creer_cours' %}" class="btn btn-primary"> Créer un cours</a></button><br><br>
+    <button type="button"><a href="{% url 'admin_liste_cours' %}" class="btn btn-primary">Cours X</a></button>
+    <button type="button"><a href="{% url 'admin_modifier_cours' %}" class="btn btn-primary">Modifier cours X</a></button><br>
+
 </body>
 </html>

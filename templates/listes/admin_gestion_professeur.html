@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des professeurs (admin)</title>
+</head>
+<body>
+    <h1>Liste des professeurs</h1>
+    <button type="button">Importer liste</button><br><br>
+    <button type="button"><a href="{% url 'admin_creer_professeur' user.id %}">Créer professeur</a></button><br><br>
+    <button type="button"><a href="{% url 'admin_modifier_professeur' %}" class="btn btn-primary">Modifier professeur X</a></button>
+
+</body>
+</html>

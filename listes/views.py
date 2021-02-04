@@ -19,7 +19,6 @@ def connexion(request):
                 username = User.objects.get(email=email.lower()).username
                 user_object = User.objects.get(email=email.lower())
 
-                print(username)
                 user = authenticate(username=username, password=password)
 
                 if user is not None and user.is_active:
@@ -42,18 +41,24 @@ def accueil_admin(request, user_object):
 def admin_cours(request):
     return render(request, 'listes/admin_cours.html')
 
+def admin_liste_cours(request):
+    return render(request, 'listes/admin_informations_cours.html')
 
-def admin_professeur(request, user_id):
+def admin_creer_cours(request):
+    return render(request, 'listes/admin_creer_cours.html')
+
+def admin_modifier_cours(request):
+    return render(request, 'listes/admin_modifier_cours.html')
+
+def admin_gestion_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
     print("HELLO")
-    return render(request, 'listes/admin_professeur.html', {'user': user})
+    return render(request, 'listes/admin_gestion_professeur.html', {'user': user})
 
+def admin_modifier_professeur(request):
+    return render(request, 'listes/admin_modifier_professeur.html')
 
-def admin_etudiant(request):
-    return render(request, 'listes/admin_etudiant.html')
-
-
-def gestion_professeur(request, user_id):
+def admin_creer_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
     print(user.first_name)
     if request.method == "POST":
@@ -81,10 +86,23 @@ def gestion_professeur(request, user_id):
         else:
             print("echec")
             messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
-        return render(request, 'listes/gestion_professeur.html', {'user': user, 'form': form})
+        return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
     else:
         print("echec2")
         form = AjouterProfesseur()
-    return render(request, 'listes/gestion_professeur.html', {'user': user, 'form': form})
+    return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
 
+def admin_etudiant(request):
+    return render(request, 'listes/admin_etudiant.html')
 
+def admin_creer_etudiant(request):
+    return render(request, 'listes/admin_creer_etudiant.html')
+
+def admin_modifier_etudiant(request):
+    return render(request, 'listes/admin_modifier_etudiant.html')
+
+def admin_cursus_etudiant(request):
+    return render(request, 'listes/admin_cursus_etudiant.html')
+
+def admin_switch_cours_etudiant(request):
+    return render(request, 'listes/admin_switch_cours_etudiant.html')
