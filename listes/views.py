@@ -6,8 +6,8 @@ from .forms import *
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password, check_password
 from .models import *
 
 
@@ -56,10 +56,6 @@ def prof_cursus_etudiant(request):
     return render(request, 'listes/prof_cursus_etudiant.html')
 
 
-def modif_mdp(request):
-    return render(request, 'listes/modif_mdp.html')
-
-
 def admin_cours(request):
     return render(request, 'listes/admin_cours.html')
 
@@ -76,6 +72,45 @@ def admin_gestion_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
     print("HELLO")
     return render(request, 'listes/admin_gestion_professeur.html', {'user': user})
+
+def modif_mdp(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == "POST":
+        form = ModifierMdp(request.POST)
+        if form.is_valid():
+            old_mdp = request.POST.get('password', False)
+            new_mdp = request.POST.get('new_password1', False)
+            new_mdp2 = request.POST.get('new_password2', False)
+            if new_mdp == new_mdp2:
+                try:
+                    user_mdp = User.objects.get(id=user_id)
+                    if check_password(old_mdp, user_mdp.password):
+                        user_mdp.set_password(new_mdp)
+                        user_mdp.save()
+                        return render(request, 'listes/accueil_professeur.html', {'user': user})
+                    else:
+                        print("echec-1")
+                        messages.error(request, 'L\'ancien mot de passe ne correspond pas')
+                        return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
+                except:
+                    render(request, 'listes/login.html', {'form': form})
+                    return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
+            else:
+                print("echec0")
+                messages.error(request, 'Les deux mot de passe saisies sont différents, veuillez réesayer')
+                return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
+        else:
+            print("echec1")
+            messages.error(request, 'Erreur lors de la modification du mot de passe, réesayer plus tard')
+        return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
+    else:
+        print("echec2")
+        form = ModifierMdp()
+    return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
+
+
+def admin_etudiant(request):
+    return render(request, 'listes/admin_etudiant.html')
 
 def admin_modifier_professeur(request):
     return render(request, 'listes/admin_modifier_professeur.html')

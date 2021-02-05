@@ -11,7 +11,7 @@ from .models import *
 
 class ConnexionForm(ModelForm):
     email = forms.CharField(label="email", max_length=150,
-                               widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
+                            widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
                                                              'placeholder': 'Email'}))
     password = forms.CharField(label="password", max_length=30,
                                widget=forms.PasswordInput(attrs={'class': 'form-control', 'name': 'password',
@@ -48,6 +48,20 @@ class AjouterProfesseur(ModelForm):
     class Meta:
         model = Professeur
         fields = ('nom', 'prenom', 'email', 'titre')
+
+
+class ModifierMdp(ModelForm):
+    password = forms.CharField(label="ancien mot de passe", max_length=100,
+                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
+    new_password1 = forms.CharField(label="nouveau mot de passe", max_length=100,
+                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
+    new_password2 = forms.CharField(label="nouveau mot de passe", max_length=100,
+                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ('password',)
+
 
 # class CreerCoursForm(forms.Form):
 #     nom = forms.CharField(label=_('Nom'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
