@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin_gestion_professeur/(?P<user_id>[0-9]+)/', views.admin_gestion_professeur, name='admin_gestion_professeur'),
     url(r'^admin_modifier_professeur/', views.admin_modifier_professeur, name='admin_modifier_professeur'),
     url(r'^admin_creer_professeur/(?P<user_id>[0-9]+)/', views.admin_creer_professeur, name='admin_creer_professeur'),
-    url(r'^', views.connexion, name='connexion')
+    url(r'^', views.connexion, name='connexion'),
+    url(r'^', views.deconnexion, name='deconnexion')
 ]
