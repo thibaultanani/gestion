@@ -49,6 +49,13 @@ class AjouterProfesseur(ModelForm):
         model = Professeur
         fields = ('nom', 'prenom', 'email', 'titre')
 
+
+class DocumentForm(forms.Form):
+    docfile = forms.FileField(
+        label='Choisir un fichier',
+        help_text='max. 42 megabytes'
+    )
+
 # class CreerCoursForm(forms.Form):
 #     nom = forms.CharField(label=_('Nom'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
 #     description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False)

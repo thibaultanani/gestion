@@ -3,10 +3,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse
 from .forms import *
+from .models import *
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
+
+import pandas as pd
 
 
 def connexion(request):
@@ -45,13 +48,7 @@ def admin_cours(request):
 
 def admin_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    print("HELLO")
     professeur_all = Professeur.objects.all().values()
-    print(professeur_all)
-    print(list(professeur_all))
-    print(professeur_all[0])
-    client_obj = User.objects.get(id=professeur_all[0]["user_id"])
-    print(client_obj)
     listProfesseur = []
     for i in range(len(professeur_all)):
         user_obj = User.objects.get(id=professeur_all[i]["user_id"])
@@ -61,9 +58,22 @@ def admin_professeur(request, user_id):
         professeur_all[i]['email'] = user_obj.email
         listProfesseur.append(professeur_all[i])
 
-    print(listProfesseur)
-
-    return render(request, 'listes/admin_professeur.html', {'user': user, "data": list(professeur_all)})
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Document(docfile=request.FILES['docfile'])
+            newdoc.save()
+            if str(newdoc.docfile.path).endswith('csv'):
+                read_csv_file(newdoc.docfile)
+            else:
+                read_xlsx_file(newdoc.docfile)
+            # Redirect to the document list after POST
+            print("good")
+            return redirect('listes/admin_professeur.html')
+    else:
+        print("echec3")
+        form = DocumentForm()
+    return render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
 
 
 def admin_etudiant(request):
@@ -105,3 +115,47 @@ def gestion_professeur(request, user_id):
     return render(request, 'listes/gestion_professeur.html', {'user': user, 'form': form})
 
 
+def read_csv_file(file):
+    mon_fichier = pd.read_csv(file.path, encoding="windows-1252", sep=";")
+    check_list = ['Doctorant', 'Maître de conférences', 'Professeur des universités', 'Tuteur', 'Aucun']
+    print(mon_fichier)
+    print("JE SUIS UN CSV")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row["Titre"] in check_list:
+            utilisateur, cree1 = User.objects.get_or_create(
+                email=row["Email"],
+                defaults={'first_name': row["Prenom"],
+                          'last_name': row["Nom"],
+                          'username': row["Email"],
+                          }
+            )
+            print(cree1)
+            professeur, cree2 = Professeur.objects.get_or_create(
+                user=utilisateur,
+                defaults={'titre': row["Titre"]}
+            )
+            print(cree2)
+
+
+def read_xlsx_file(file):
+    mon_fichier = pd.read_excel(file.path, engine='openpyxl')
+    check_list = ['Doctorant', 'Maître de conférences', 'Professeur des universités', 'Tuteur', 'Aucun']
+    print(mon_fichier)
+    print("JE SUIS UN XLSX")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row["Titre"] in check_list:
+            utilisateur, cree1 = User.objects.get_or_create(
+                email=row["Email"],
+                defaults={'first_name': row["Prenom"],
+                          'last_name': row["Nom"],
+                          'username': row["Email"],
+                          }
+            )
+            print(cree1)
+            professeur, cree2 = Professeur.objects.get_or_create(
+                user=utilisateur,
+                defaults={'titre': row["Titre"]}
+            )
+            print(cree2)

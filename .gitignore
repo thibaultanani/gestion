@@ -10,3 +10,5 @@ gestion/__pycache__/*
 listes/__pycache__/*
 listes/migrations/*
 db.sqlite3
+migrations/*
+listes/media/*

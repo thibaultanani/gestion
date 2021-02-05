@@ -10,6 +10,7 @@ pip3 install -r requirements.txt
 
 # Installation des dépendances javascript
 cd ..
+mkdir media
 cd static
 npm install
 cd node_modules
