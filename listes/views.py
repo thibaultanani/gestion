@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse
 from .forms import *
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -34,6 +34,9 @@ def connexion(request):
         form = ConnexionForm()
     return render(request, 'listes/login.html', {'form': form})
 
+def deconnexion(request):
+    logout(request)
+    return render(request,'listes/login.html')
 
 @login_required(login_url="/connexion")
 def accueil_admin(request, user_object):
