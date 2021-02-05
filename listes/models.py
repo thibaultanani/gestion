@@ -7,8 +7,6 @@ import datetime
 from django.contrib.auth.models import User
 
 
-
-
 class Admnistrateur(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,default=None)
     poste = models.CharField(max_length=100)

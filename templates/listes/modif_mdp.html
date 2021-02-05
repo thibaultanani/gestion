@@ -1,10 +1,16 @@
 <!DOCTYPE html>
+{% load i18n %}
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Modifaction mot de passe </title>
+    <title>Title</title>
 </head>
 <body>
-    <h1>Modification mot de passe</h1>
+    {{ user.first_name }}
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
 </body>
 </html>

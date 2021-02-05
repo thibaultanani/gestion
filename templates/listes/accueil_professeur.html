@@ -12,7 +12,7 @@
 
 <button><a href="{% url 'prof_liste_etudiant' %}">Cours X</a></button>
 
-<button><a href="{% url 'modif_mdp' %}">Modif mot de passe</a></button>
+<button><a href="{% url 'modif_mdp' user.id %}">Modification mot de passe</a></button>
 
 <button><a href="{% url 'connexion' %}">Déconexion</a></button>
 </body>
