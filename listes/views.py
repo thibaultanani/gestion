@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from .models import *
 
+import pandas as pd
+
 
 def connexion(request):
     if request.method == "POST":
@@ -73,8 +75,32 @@ def admin_modifier_cours(request):
 
 def admin_gestion_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    print("HELLO")
-    return render(request, 'listes/admin_gestion_professeur.html', {'user': user})
+    professeur_all = Professeur.objects.all().values()
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Document(docfile=request.FILES['docfile'])
+            newdoc.save()
+            if str(newdoc.docfile.path).endswith('csv'):
+                read_csv_file(newdoc.docfile)
+            else:
+                read_xlsx_file(newdoc.docfile)
+            # Redirect to the document list after POST
+            print("good")
+            return redirect('listes/admin_professeur.html')
+    else:
+        print("echec3")
+        form = DocumentForm()
+    return render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
 
 def modif_mdp(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -110,7 +136,6 @@ def modif_mdp(request, user_id):
         print("echec2")
         form = ModifierMdp()
     return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
-
 
 def admin_etudiant(request):
     return render(request, 'listes/admin_etudiant.html')
@@ -159,11 +184,59 @@ def admin_etudiant(request):
 def admin_creer_etudiant(request):
     return render(request, 'listes/admin_creer_etudiant.html')
 
+def read_csv_file(file):
+    mon_fichier = pd.read_csv(file.path, encoding="windows-1252", sep=";")
+    check_list = ['Doctorant', 'Maître de conférences', 'Professeur des universités', 'Tuteur', 'Aucun']
+    print(mon_fichier)
+    print("JE SUIS UN CSV")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row["Titre"] in check_list:
+            utilisateur, cree1 = User.objects.get_or_create(
+                email=row["Email"],
+                defaults={'first_name': row["Prenom"],
+                          'last_name': row["Nom"],
+                          'username': row["Email"],
+                          }
+            )
+            print(cree1)
+            professeur, cree2 = Professeur.objects.get_or_create(
+                user=utilisateur,
+                defaults={'titre': row["Titre"]}
+            )
+            print(cree2)
+
+
+def read_xlsx_file(file):
+    mon_fichier = pd.read_excel(file.path, engine='openpyxl')
+    check_list = ['Doctorant', 'Maître de conférences', 'Professeur des universités', 'Tuteur', 'Aucun']
+    print(mon_fichier)
+    print("JE SUIS UN XLSX")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row["Titre"] in check_list:
+            utilisateur, cree1 = User.objects.get_or_create(
+                email=row["Email"],
+                defaults={'first_name': row["Prenom"],
+                          'last_name': row["Nom"],
+                          'username': row["Email"],
+                          }
+            )
+            print(cree1)
+            professeur, cree2 = Professeur.objects.get_or_create(
+                user=utilisateur,
+                defaults={'titre': row["Titre"]}
+            )
+            print(cree2)
+
+
 def admin_modifier_etudiant(request):
     return render(request, 'listes/admin_modifier_etudiant.html')
 
+
 def admin_cursus_etudiant(request):
     return render(request, 'listes/admin_cursus_etudiant.html')
+
 
 def admin_switch_cours_etudiant(request):
     return render(request, 'listes/admin_switch_cours_etudiant.html')

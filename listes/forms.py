@@ -11,7 +11,7 @@ from .models import *
 
 class ConnexionForm(ModelForm):
     email = forms.CharField(label="email", max_length=150,
-                            widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
+                               widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
                                                              'placeholder': 'Email'}))
     password = forms.CharField(label="password", max_length=30,
                                widget=forms.PasswordInput(attrs={'class': 'form-control', 'name': 'password',
@@ -48,6 +48,13 @@ class AjouterProfesseur(ModelForm):
     class Meta:
         model = Professeur
         fields = ('nom', 'prenom', 'email', 'titre')
+
+
+class DocumentForm(forms.Form):
+    docfile = forms.FileField(
+        label='Choisir un fichier',
+        help_text='max. 42 megabytes'
+    )
 
 
 class ModifierMdp(ModelForm):
