@@ -36,44 +36,53 @@ def connexion(request):
         form = ConnexionForm()
     return render(request, 'listes/login.html', {'form': form})
 
+
 def deconnexion(request):
     logout(request)
-    return render(request,'listes/login.html')
+    return render(request, 'listes/login.html')
+
 
 @login_required(login_url="/connexion")
 def accueil_admin(request, user_object):
     user = get_object_or_404(User, id=user_object.id)
     print(user.first_name)
-    return render(request, 'listes/accueil_admin.html', {'user', user})
+    return render(request, 'listes/accueil_admin.html', {'user': user})
+
 
 @login_required(login_url="/connexion")
-def accueil_professeur(request, user_object):
-    user = get_object_or_404(User, id=user_object.id)
+def accueil_professeur(request, user_id):
+    user = get_object_or_404(User, id=user_id)
     print(user.first_name)
-    return render(request, 'listes/accueil_professeur.html', {'user', user})
+    return render(request, 'listes/accueil_professeur.html', {'user': user})
 
 
-def prof_liste_etudiant(request):
-    return render(request, 'listes/prof_liste_etudiant.html')
+def prof_liste_etudiant(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    return render(request, 'listes/prof_liste_etudiant.html', {'user': user})
 
 
-def prof_cursus_etudiant(request):
-    return render(request, 'listes/prof_cursus_etudiant.html')
+def prof_cursus_etudiant(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    return render(request, 'listes/prof_cursus_etudiant.html', {'user': user})
 
 
 def admin_cours(request):
     return render(request, 'listes/admin_cours.html')
 
+
 def admin_liste_cours(request):
     return render(request, 'listes/admin_informations_cours.html')
+
 
 def admin_creer_cours(request):
     return render(request, 'listes/admin_creer_cours.html')
 
+
 def admin_modifier_cours(request):
     return render(request, 'listes/admin_modifier_cours.html')
 
-def admin_gestion_professeur(request, user_id):
+
+def admin_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
     professeur_all = Professeur.objects.all().values()
     listProfesseur = []
@@ -101,6 +110,7 @@ def admin_gestion_professeur(request, user_id):
         print("echec3")
         form = DocumentForm()
     return render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
+
 
 def modif_mdp(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -137,11 +147,10 @@ def modif_mdp(request, user_id):
         form = ModifierMdp()
     return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
 
-def admin_etudiant(request):
-    return render(request, 'listes/admin_etudiant.html')
 
 def admin_modifier_professeur(request):
     return render(request, 'listes/admin_modifier_professeur.html')
+
 
 def admin_creer_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -178,11 +187,26 @@ def admin_creer_professeur(request, user_id):
         form = AjouterProfesseur()
     return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
 
+
 def admin_etudiant(request):
     return render(request, 'listes/admin_etudiant.html')
 
+
 def admin_creer_etudiant(request):
     return render(request, 'listes/admin_creer_etudiant.html')
+
+
+def admin_modifier_etudiant(request):
+    return render(request, 'listes/admin_modifier_etudiant.html')
+
+
+def admin_cursus_etudiant(request):
+    return render(request, 'listes/admin_cursus_etudiant.html')
+
+
+def admin_switch_cours_etudiant(request):
+    return render(request, 'listes/admin_switch_cours_etudiant.html')
+
 
 def read_csv_file(file):
     mon_fichier = pd.read_csv(file.path, encoding="windows-1252", sep=";")
@@ -229,14 +253,3 @@ def read_xlsx_file(file):
             )
             print(cree2)
 
-
-def admin_modifier_etudiant(request):
-    return render(request, 'listes/admin_modifier_etudiant.html')
-
-
-def admin_cursus_etudiant(request):
-    return render(request, 'listes/admin_cursus_etudiant.html')
-
-
-def admin_switch_cours_etudiant(request):
-    return render(request, 'listes/admin_switch_cours_etudiant.html')

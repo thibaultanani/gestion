@@ -59,11 +59,11 @@ class DocumentForm(forms.Form):
 
 class ModifierMdp(ModelForm):
     password = forms.CharField(label="ancien mot de passe", max_length=100,
-                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
+                               widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     new_password1 = forms.CharField(label="nouveau mot de passe", max_length=100,
-                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
+                                    widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     new_password2 = forms.CharField(label="nouveau mot de passe", max_length=100,
-                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
+                                    widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User

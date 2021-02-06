@@ -5,13 +5,13 @@
     <title>Accueil Professeur</title>
 </head>
 <body>
-Bonjour prof , {{ user.first_name }} {{ user.last_name }}
+Bonjour prof , {{ user.first_name }} {{ user.last_name }} {{ user.id }}
     <h1>Accueil professeur</h1>
     <h2>Bonjour professeur !</h2>
     <h2>Liste de cours: </h2>
 
 
-<button><a href="{% url 'prof_liste_etudiant' %}">Cours X</a></button>
+<button><a href="{% url 'prof_liste_etudiant' user.id %}">Cours X</a></button>
 
 <button><a href="{% url 'modif_mdp' user.id %}">Modification mot de passe</a></button>
 

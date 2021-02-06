@@ -7,8 +7,15 @@
 <body>
     <h1>Créer un professeur </h1>
     Formulaire<br>
-    <button type="button"><a href="{% url 'admin_gestion_professeur' user.id %}" class="btn btn-primary">Retour</a></button>
+    <button type="button"><a href="{% url 'admin_professeur' user.id %}" class="btn btn-primary">Retour</a></button>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
+
+    {{ user.first_name }}
+    {{ user.last_name }}
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
 
 </body>
 </html>
