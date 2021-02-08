@@ -159,9 +159,9 @@ def modif_mdp(request, user_id):
     return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
 
 
-def admin_modifier_professeur(request, user_id, admin_id):
-    user = get_object_or_404(User, id=user_id)
-    admin = get_object_or_404(User, id=admin_id)
+def admin_modifier_professeur(request, user_id, prof_id):
+    user = get_object_or_404(User, id=prof_id)
+    admin = get_object_or_404(User, id=user_id)
     prof = Professeur.objects.get(user=user)
     print("SALUT")
     if request.method == "POST":
@@ -175,7 +175,7 @@ def admin_modifier_professeur(request, user_id, admin_id):
             email = request.POST.get('email', False)
             titre = request.POST.get('titre', False)
 
-            utilisateur = User.objects.get(id=user_id)
+            utilisateur = User.objects.get(id=prof_id)
             utilisateur.first_name = prenom
             utilisateur.last_name = nom
             utilisateur.email = email
@@ -459,9 +459,9 @@ def export_etudiant_csv(request):
     return response
 
 
-def admin_supprimer_professeur(request, user_id, admin_id):
-    user = get_object_or_404(User, id=user_id)
-    admin = get_object_or_404(User, id=admin_id)
+def admin_supprimer_professeur(request, user_id, prof_id):
+    user = get_object_or_404(User, id=prof_id)
+    admin = get_object_or_404(User, id=user_id)
     prof = Professeur.objects.get(user=user)
     prof.delete()
     user.delete()
@@ -480,9 +480,9 @@ def admin_supprimer_professeur(request, user_id, admin_id):
     return render(request, 'listes/admin_professeur.html', {'user': admin, 'form': form, "data": list(professeur_all)})
 
 
-def admin_supprimer_etudiant(request, user_id, admin_id):
-    admin = get_object_or_404(User, id=admin_id)
-    etu = Etudiant.objects.get(id=user_id)
+def admin_supprimer_etudiant(request, user_id, etu_id):
+    admin = get_object_or_404(User, id=user_id)
+    etu = Etudiant.objects.get(id=etu_id)
     etu.delete()
 
     etudiant_all = Etudiant.objects.all().values()

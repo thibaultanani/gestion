@@ -47,8 +47,8 @@
               <td>{{ x.titre }}</td>
               <td>{{ x.email }}</td>
               <td>
-                  <a href="{% url 'admin_modifier_professeur' x.user_id user.id %}"><i class="fas fa-edit"></i></a>
-                  <form action="{% url 'admin_supprimer_professeur' x.user_id user.id %}" method="post">
+                  <a href="{% url 'admin_modifier_professeur' user.id x.user_id%}"><i class="fas fa-edit"></i></a>
+                  <form action="{% url 'admin_supprimer_professeur' user.id x.user_id%}" method="post">
                       {% csrf_token %}
 
                       <button onclick="return confirm('Confirmer la suppression de ce professeur?');">

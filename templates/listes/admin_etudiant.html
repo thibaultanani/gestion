@@ -56,7 +56,7 @@
               <td>
                   <a href="{%url 'admin_modifier_etudiant' user.id x.id%}"><i class="fas fa-edit"></i></a>
                   <a href="{%url 'admin_switch_cours_etudiant' user.id x.id%}"><i class="fas fa-exchange-alt"></i></a>
-                  <form action="{% url 'admin_supprimer_etudiant' x.id user.id %}" method="post">
+                  <form action="{% url 'admin_supprimer_etudiant' user.id x.id %}" method="post">
                       {% csrf_token %}
 
                       <button onclick="return confirm('Confirmer la suppression de cet etudiant?');">
