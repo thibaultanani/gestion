@@ -9,7 +9,9 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from .models import *
+from io import BytesIO
 
+import numpy as np
 import pandas as pd
 
 
@@ -105,7 +107,16 @@ def admin_professeur(request, user_id):
                 read_xlsx_file(newdoc.docfile)
             # Redirect to the document list after POST
             print("good")
-            return redirect('listes/admin_professeur.html')
+            professeur_all = Professeur.objects.all().values()
+            listProfesseur = []
+            for i in range(len(professeur_all)):
+                user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+                professeur_all[i]['username'] = user_obj.username
+                professeur_all[i]['first_name'] = user_obj.first_name
+                professeur_all[i]['last_name'] = user_obj.last_name
+                professeur_all[i]['email'] = user_obj.email
+                listProfesseur.append(professeur_all[i])
+            render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
     else:
         print("echec3")
         form = DocumentForm()
@@ -148,8 +159,53 @@ def modif_mdp(request, user_id):
     return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
 
 
-def admin_modifier_professeur(request):
-    return render(request, 'listes/admin_modifier_professeur.html')
+def admin_modifier_professeur(request, user_id, admin_id):
+    user = get_object_or_404(User, id=user_id)
+    admin = get_object_or_404(User, id=admin_id)
+    prof = Professeur.objects.get(user=user)
+    print("SALUT")
+    if request.method == "POST":
+        form = ModifierProfesseur(request.POST, initial={"nom": user.last_name,
+                                                         "prenom": user.first_name,
+                                                         "email": user.email,
+                                                         "titre": prof.titre})
+        if form.is_valid():
+            prenom = request.POST.get('prenom', False)
+            nom = request.POST.get('nom', False)
+            email = request.POST.get('email', False)
+            titre = request.POST.get('titre', False)
+
+            utilisateur = User.objects.get(id=user_id)
+            utilisateur.first_name = prenom
+            utilisateur.last_name = nom
+            utilisateur.email = email
+            utilisateur.username = email
+
+            utilisateur.save()
+
+            professeur = Professeur.objects.get(user=utilisateur)
+            professeur.titre = titre
+
+            professeur.save()
+
+            print('#####')
+            print(user)
+            print(professeur)
+            print('#####')
+            messages.success(request, 'Un professeur a été modifié')
+        else:
+            messages.error(request, 'Erreur lors de la modification, réesayez plus tard')
+        print("####")
+        print(admin.id)
+        print("####")
+        return admin_professeur(request, admin.id)
+    else:
+        form = ModifierProfesseur(initial={"nom": user.last_name,
+                                           "prenom": user.first_name,
+                                           "email": user.email,
+                                           "titre": prof.titre})
+    print("HELLO2")
+    return render(request, 'listes/admin_modifier_professeur.html', {'user': user, 'admin': admin, 'form': form})
 
 
 def admin_creer_professeur(request, user_id):
@@ -180,7 +236,7 @@ def admin_creer_professeur(request, user_id):
             messages.success(request, 'Un nouveau professeur a été créé')
         else:
             print("echec")
-            messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
+            messages.error(request, 'Erreur lors de l\'ajout, réesayez plus tard')
         return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
     else:
         print("echec2")
@@ -188,8 +244,30 @@ def admin_creer_professeur(request, user_id):
     return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
 
 
-def admin_etudiant(request):
-    return render(request, 'listes/admin_etudiant.html')
+def admin_etudiant(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    etudiant_all = Etudiant.objects.all().values()
+    print(etudiant_all)
+    print(list(etudiant_all))
+
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Document(docfile=request.FILES['docfile'])
+            newdoc.save()
+            if str(newdoc.docfile.path).endswith('csv'):
+                read_etu_csv_file(newdoc.docfile)
+            else:
+                read_etu_xlsx_file(newdoc.docfile)
+            # Redirect to the document list after POST
+            print("good")
+            etudiant_all = Etudiant.objects.all().values()
+            return render(request, 'listes/admin_etudiant.html',
+                          {'user': user, 'form': form, "data": list(etudiant_all)})
+    else:
+        print("echec3")
+        form = DocumentForm()
+    return render(request, 'listes/admin_etudiant.html', {'user': user, 'form': form, "data": list(etudiant_all)})
 
 
 def admin_creer_etudiant(request):
@@ -253,3 +331,157 @@ def read_xlsx_file(file):
             )
             print(cree2)
 
+
+def read_etu_csv_file(file):
+    mon_fichier = pd.read_csv(file.path, encoding="windows-1252", sep=";")
+    check_list = ['L1', 'L2', 'L3', 'M1', 'M2']
+    print(mon_fichier)
+    print("JE SUIS UN CSV")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row['Niveau 1'] in check_list:
+            niveaux = []
+            niveaux.append(row['Niveau 1'])
+            if row['Niveau 2']:
+                niveaux.append(row['Niveau 2'])
+            etudiant, cree1 = Etudiant.objects.get_or_create(
+                numEtudiant=row["Numero Etudiant"],
+                email=row["Email"],
+                defaults={'nom': row["Nom"],
+                          'prenom': row["Prenom"],
+                          'niveaux': niveaux,
+                          }
+            )
+            print(cree1)
+
+
+def read_etu_xlsx_file(file):
+    mon_fichier = pd.read_excel(file.path, engine='openpyxl')
+    check_list = ['L1', 'L2', 'L3', 'M1', 'M2']
+    print(mon_fichier)
+    print("JE SUIS UN XLSX")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row['Niveau 1'] in check_list:
+            niveaux = []
+            niveaux.append(row['Niveau 1'])
+            if row['Niveau 2']:
+                niveaux.append(row['Niveau 2'])
+            etudiant, cree1 = Etudiant.objects.get_or_create(
+                numEtudiant=row["Numero Etudiant"],
+                email=row["Email"],
+                defaults={'nom': row["Nom"],
+                          'prenom': row["Prenom"],
+                          'niveaux': niveaux,
+                          }
+            )
+            print(cree1)
+
+
+def export_professeur_xlsx(request):
+    professeur_all = Professeur.objects.all().values()
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+    print(listProfesseur)
+    with BytesIO() as b:
+        df = pd.DataFrame(listProfesseur)
+        writer = pd.ExcelWriter(b, engine='openpyxl')
+        df.to_excel(writer, index=False)
+        writer.save()
+        response = HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=liste_professeur.xlsx'
+        return response
+
+
+def export_professeur_csv(request):
+    professeur_all = Professeur.objects.all().values()
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+    print(listProfesseur)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=liste_professeur.csv'
+    df = pd.DataFrame(listProfesseur)
+    df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
+    return response
+
+
+def export_etudiant_xlsx(request):
+    etudiant_all = Etudiant.objects.all().values()
+    print(etudiant_all)
+    print(list(etudiant_all))
+    with BytesIO() as b:
+        df = pd.DataFrame(list(etudiant_all))
+        writer = pd.ExcelWriter(b, engine='openpyxl')
+        df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+        df = df.replace(np.nan, '', regex=True)
+        df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
+        print(df)
+        df.drop('niveaux', inplace=True, axis=1)
+        df.to_excel(writer, index=False)
+        writer.save()
+        response = HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=liste_etudiant.xlsx'
+        return response
+
+
+def export_etudiant_csv(request):
+    etudiant_all = Etudiant.objects.all().values()
+    print(etudiant_all)
+    print(list(etudiant_all))
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=liste_etudiant.csv'
+    df = pd.DataFrame(list(etudiant_all))
+    df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+    df = df.replace(np.nan, '', regex=True)
+    df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
+    print(df)
+    df.drop('niveaux', inplace=True, axis=1)
+    df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
+    return response
+
+
+def admin_supprimer_professeur(request, user_id, admin_id):
+    user = get_object_or_404(User, id=user_id)
+    admin = get_object_or_404(User, id=admin_id)
+    prof = Professeur.objects.get(user=user)
+    prof.delete()
+    user.delete()
+
+    professeur_all = Professeur.objects.all().values()
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+    form = DocumentForm()
+
+    return render(request, 'listes/admin_professeur.html', {'user': admin, 'form': form, "data": list(professeur_all)})
+
+
+def admin_supprimer_etudiant(request, user_id, admin_id):
+    admin = get_object_or_404(User, id=admin_id)
+    etu = Etudiant.objects.get(id=user_id)
+    etu.delete()
+
+    etudiant_all = Etudiant.objects.all().values()
+    print(etudiant_all)
+    print(list(etudiant_all))
+
+    form = DocumentForm()
+
+    return render(request, 'listes/admin_etudiant.html', {'user': admin, 'form': form, "data": list(etudiant_all)})

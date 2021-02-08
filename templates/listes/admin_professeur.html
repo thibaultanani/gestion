@@ -22,6 +22,8 @@
     {{ user.last_name }}
     <a href="{% url 'admin_creer_professeur' user.id %}">Ajouter prof</a>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
+    <button><a href="{% url 'export_professeur_xlsx' %}">Exporter (Excel)</a></button>
+    <button><a href="{% url 'export_professeur_csv' %}">Exporter (CSV)</a></button>
     <!-- Main content -->
     <section class="content">
 
@@ -44,7 +46,16 @@
               <td>{{ x.first_name }}</td>
               <td>{{ x.titre }}</td>
               <td>{{ x.email }}</td>
-              <td>{{ x.email }}</td>
+              <td>
+                  <a href="{% url 'admin_modifier_professeur' x.user_id user.id %}"><i class="fas fa-edit"></i></a>
+                  <form action="{% url 'admin_supprimer_professeur' x.user_id user.id %}" method="post">
+                      {% csrf_token %}
+
+                      <button onclick="return confirm('Confirmer la suppression de ce professeur?');">
+                          <i class="fas fa-trash"></i>
+                      </button>
+                  </form>
+              </td>
 
             </tr>
           {% endfor %}
@@ -114,6 +125,7 @@
       "responsive": true,
     });
   });
+
 </script>
 </body>
 </html>
