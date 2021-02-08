@@ -1,16 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Gestion des etudiants (admin)</title>
+   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | DataTables</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/fontawesome-free/css/all.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/dist/css/adminlte.min.css">
 </head>
-<body>
+<body class="hold-transition sidebar-mini">
     <h1>Liste des étudiants </h1>
+     {{ user.first_name }}
+    {{ user.last_name }}
     <button type="button">Importer liste</button><br><br>
-    <button type="button"><a href="{% url 'admin_creer_etudiant' %}">Créer étudiant-e</a></button><br><br>
-    <button type="button"><a href="{% url 'admin_modifier_etudiant' %}" class="btn btn-primary">Modifier étudiant-e X</a></button>
-    <button type="button"><a href="{% url 'admin_cursus_etudiant' %}">Cursus pédagogique étudiant-e X</a></button>
-    <button type="button"><a href="{% url 'admin_switch_cours_etudiant' %}">Liste des cours de l'étudiant-e X</a></button>
+    <button type="button"><a href="{% url 'admin_creer_etudiant' user.id %}">Créer étudiant-e</a></button><br><br>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
+
+
+
+     <section class="content">
+
+                <table id="example1" class="table table-bordered table-striped">
+       <thead>
+         <tr>
+           <th>Id</th>
+             <th>Numéro Etudiant</th>
+           <th>Nom</th>
+           <th>Prénom</th>
+           <th>Email</th>
+           <th>Action</th>
+         </tr>
+       </thead>
+        <tbody>
+          {% for x in data %}
+            <tr>
+              <td>{{ x.id}}</td>
+                <td>{{ x.numEtudiant }}</td>
+              <td><a href="{% url 'admin_cursus_etudiant' user.id x.id %}">{{ x.nom }}</a></td>
+                <td><a href="{% url 'admin_cursus_etudiant' user.id x.id%}">{{ x.prenom }}</a></td>
+              <td>{{ x.email }}</td>
+                <td>
+                    <a href="{%url 'admin_modifier_etudiant' user.id x.id%}"><i class="fas fa-edit"></i></a>
+                    <a href="{%url 'admin_switch_cours_etudiant' user.id x.id%}"><i class="fas fa-exchange-alt"></i></a>
+
+                </td>
+
+            </tr>
+          {% endfor %}
+          </tbody>
+
+                </table>
+
+    </section>
+
+
+     <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+
+
+
+
+<!-- jQuery -->
+<script src="/static/node_modules/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/node_modules/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables  & Plugins -->
+<script src="/static/node_modules/AdminLTE/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/jszip/jszip.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/pdfmake/pdfmake.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/pdfmake/vfs_fonts.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/node_modules/AdminLTE/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="/static/node_modules/AdminLTE/dist/js/demo.js"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+    $('#example1').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "responsive": true,
+    });
+  });
+</script>
 </body>
 </html>
