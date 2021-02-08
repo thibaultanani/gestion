@@ -5,9 +5,9 @@
     <title>Modification étudiant-e</title>
 </head>
 <body>
-    <h1>Modifier étudiant-e</h1>
+    <h1>Modifier étudiant-e {{ etu.prenom }} {{ etu.nom }}</h1>
     Formulaire<br>
-    <button type="button"><a href="{% url 'admin_etudiant' %}" class="btn btn-primary">Retour</a></button>
+    <button type="button"><a href="{% url 'admin_etudiant' user.id %}" class="btn btn-primary">Retour</a></button>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
 </body>
 </html>

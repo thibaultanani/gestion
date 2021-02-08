@@ -5,10 +5,10 @@
     <title>Déplacer étudiant-e</title>
 </head>
 <body>
-    <h1>Liste des cours de l'étudiant-e X</h1>
+    <h1>Liste des cours de l'étudiant-e X {{ etu.prenom }} {{ etu.nom }}</h1>
     Idée de Matthieu inspirée de l'interface du merge<br>
     <button type="submit">valider</button><br>
-    <button type="button"><a href="{% url 'admin_etudiant' %}" class="btn btn-primary">Retour</a></button>
+    <button type="button"><a href="{% url 'admin_etudiant' user.id %}" class="btn btn-primary">Retour</a></button>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
 </body>
 </html>

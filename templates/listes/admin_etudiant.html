@@ -14,19 +14,19 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="/static/node_modules/AdminLTE/dist/css/adminlte.min.css">
 </head>
-<body>
+<body class="hold-transition sidebar-mini">
     <h1>Liste des étudiants </h1>
+     {{ user.first_name }}
+    {{ user.last_name }}
     <button type="button">Importer liste</button><br><br>
-    <button type="button"><a href="{% url 'admin_creer_etudiant' %}">Créer étudiant-e</a></button><br><br>
-    <button type="button"><a href="{% url 'admin_modifier_etudiant' %}" class="btn btn-primary">Modifier étudiant-e X</a></button>
-    <button type="button"><a href="{% url 'admin_cursus_etudiant' %}">Cursus pédagogique étudiant-e X</a></button>
-    <button type="button"><a href="{% url 'admin_switch_cours_etudiant' %}">Liste des cours de l'étudiant-e X</a></button>
+    <button type="button"><a href="{% url 'admin_creer_etudiant' user.id %}">Créer étudiant-e</a></button><br><br>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
     <button><a href="{% url 'export_etudiant_xlsx' %}">Exporter (Excel)</a></button>
     <button><a href="{% url 'export_etudiant_csv' %}">Exporter (CSV)</a></button>
 
 
-<section class="content">
+
+     <section class="content">
 
                 <table id="example1" class="table table-bordered table-striped">
        <thead>
@@ -43,8 +43,8 @@
           {% for x in data %}
             <tr>
               <td>{{ x.numEtudiant }}</td>
-              <td>{{ x.nom }}</td>
-              <td>{{ x.prenom }}</td>
+              <td><a href="{% url 'admin_cursus_etudiant' user.id x.id %}">{{ x.nom }}</a></td>
+              <td><a href="{% url 'admin_cursus_etudiant' user.id x.id%}">{{ x.prenom }}</a></td>
               <td>{{ x.email }}</td>
               <td>
                   {% for niv in x.niveaux %}
@@ -54,8 +54,9 @@
                   {% endfor %}
               </td>
               <td>
-                  <!--<a href=""><i class="fas fa-edit"></i></a>-->
-                   <form action="{% url 'admin_supprimer_etudiant' x.id user.id %}" method="post">
+                  <a href="{%url 'admin_modifier_etudiant' user.id x.id%}"><i class="fas fa-edit"></i></a>
+                  <a href="{%url 'admin_switch_cours_etudiant' user.id x.id%}"><i class="fas fa-exchange-alt"></i></a>
+                  <form action="{% url 'admin_supprimer_etudiant' x.id user.id %}" method="post">
                       {% csrf_token %}
 
                       <button onclick="return confirm('Confirmer la suppression de cet etudiant?');">
@@ -83,18 +84,14 @@
             <p><input type="submit" value="Upload" /></p>
         </form>
 
-  <footer class="main-footer">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 3.1.0-rc
-    </div>
-    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
-  </footer>
-
-  <!-- Control Sidebar -->
+     <!-- Control Sidebar -->
   <aside class="control-sidebar control-sidebar-dark">
     <!-- Control sidebar content goes here -->
   </aside>
-  <!-- /.control-sidebar -->
+
+
+
+
 <!-- jQuery -->
 <script src="/static/node_modules/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->

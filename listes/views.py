@@ -270,20 +270,27 @@ def admin_etudiant(request, user_id):
     return render(request, 'listes/admin_etudiant.html', {'user': user, 'form': form, "data": list(etudiant_all)})
 
 
-def admin_creer_etudiant(request):
-    return render(request, 'listes/admin_creer_etudiant.html')
+def admin_creer_etudiant(request,user_id):
+    user = get_object_or_404(User, id=user_id)
+    return render(request, 'listes/admin_creer_etudiant.html',{'user':user})
 
 
-def admin_modifier_etudiant(request):
-    return render(request, 'listes/admin_modifier_etudiant.html')
+def admin_modifier_etudiant(request,user_id,etu_id):
+    user = get_object_or_404(User, id=user_id)
+    etu = get_object_or_404(Etudiant, id=etu_id)
+    return render(request, 'listes/admin_modifier_etudiant.html',{'user':user,'etu':etu})
 
 
-def admin_cursus_etudiant(request):
-    return render(request, 'listes/admin_cursus_etudiant.html')
+def admin_cursus_etudiant(request,user_id,etu_id):
+    user = get_object_or_404(User, id=user_id)
+    etu = get_object_or_404(Etudiant, id=etu_id)
+    return render(request, 'listes/admin_cursus_etudiant.html',{'user':user,'etu':etu})
 
 
-def admin_switch_cours_etudiant(request):
-    return render(request, 'listes/admin_switch_cours_etudiant.html')
+def admin_switch_cours_etudiant(request,user_id,etu_id):
+    user = get_object_or_404(User, id=user_id)
+    etu = get_object_or_404(Etudiant, id=etu_id)
+    return render(request, 'listes/admin_switch_cours_etudiant.html',{'user':user,'etu':etu})
 
 
 def read_csv_file(file):
