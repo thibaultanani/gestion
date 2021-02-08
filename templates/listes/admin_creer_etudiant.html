@@ -1,13 +1,16 @@
 <!DOCTYPE html>
+{% load i18n %}
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Création étudiant-e</title>
 </head>
 <body>
-    <h1>Créer étudiant-e</h1>
-    Formulaire<br>
-    <button type="button"><a href="{% url 'admin_etudiant' %}" class="btn btn-primary">Retour</a></button>
-    <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
+    {{ user.first_name }}
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
 </body>
 </html>

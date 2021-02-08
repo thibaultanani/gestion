@@ -34,15 +34,18 @@ def connexion(request):
         form = ConnexionForm()
     return render(request, 'listes/login.html', {'form': form})
 
+
 def deconnexion(request):
     logout(request)
     return render(request,'listes/login.html')
+
 
 @login_required(login_url="/connexion")
 def accueil_admin(request, user_object):
     user = get_object_or_404(User, id=user_object.id)
     print(user.first_name)
     return render(request, 'listes/accueil_admin.html', {'user', user})
+
 
 @login_required(login_url="/connexion")
 def accueil_professeur(request, user_object):
@@ -62,19 +65,24 @@ def prof_cursus_etudiant(request):
 def admin_cours(request):
     return render(request, 'listes/admin_cours.html')
 
+
 def admin_liste_cours(request):
     return render(request, 'listes/admin_informations_cours.html')
+
 
 def admin_creer_cours(request):
     return render(request, 'listes/admin_creer_cours.html')
 
+
 def admin_modifier_cours(request):
     return render(request, 'listes/admin_modifier_cours.html')
+
 
 def admin_gestion_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
     print("HELLO")
     return render(request, 'listes/admin_gestion_professeur.html', {'user': user})
+
 
 def modif_mdp(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -112,11 +120,9 @@ def modif_mdp(request, user_id):
     return render(request, 'listes/modif_mdp.html', {'user': user, 'form': form})
 
 
-def admin_etudiant(request):
-    return render(request, 'listes/admin_etudiant.html')
-
 def admin_modifier_professeur(request):
     return render(request, 'listes/admin_modifier_professeur.html')
+
 
 def admin_creer_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -153,17 +159,46 @@ def admin_creer_professeur(request, user_id):
         form = AjouterProfesseur()
     return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
 
+
+def admin_creer_etudiant(request):
+    if request.method == "POST":
+        form = AjouterEtudiant(request.POST)
+        if form.is_valid():
+            numEtu = request.POST.get('numEtudiant', False)
+            nom = request.POST.get('nom', False)
+            prenom = request.POST.get('prenom', False)
+            email = request.POST.get('email', False)
+            niveaux = [request.POST.get('niveaux', False), request.POST.get('niveaux2', False)]
+
+            etudiant = Etudiant(numEtudiant=numEtu, nom=nom, prenom=prenom, email=email, niveaux=niveaux)
+            etudiant.save()
+
+            print('#####')
+            print(etudiant)
+            print('#####')
+            messages.success(request, 'Un nouvelle étudiant a été créé')
+            return render(request, 'listes/admin_etudiant.html')
+        else:
+            print("echec")
+            messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
+        return render(request, 'listes/admin_creer_etudiant.html', {'form': form})
+    else:
+        print("echec2")
+        form = AjouterEtudiant()
+    return render(request, 'listes/admin_creer_etudiant.html', {'form': form})
+
+
 def admin_etudiant(request):
     return render(request, 'listes/admin_etudiant.html')
 
-def admin_creer_etudiant(request):
-    return render(request, 'listes/admin_creer_etudiant.html')
 
 def admin_modifier_etudiant(request):
     return render(request, 'listes/admin_modifier_etudiant.html')
 
+
 def admin_cursus_etudiant(request):
     return render(request, 'listes/admin_cursus_etudiant.html')
+
 
 def admin_switch_cours_etudiant(request):
     return render(request, 'listes/admin_switch_cours_etudiant.html')
