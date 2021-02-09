@@ -125,6 +125,8 @@ class AjouterCours(forms.Form):
     nom_prof2=UserModelChoiceField(label="",queryset=User.objects.all(), required=False)
     nom_prof3=UserModelChoiceField(label="",queryset=User.objects.all(), required=False)
     Niveau=forms.ChoiceField(label="Niveau",choices=niveaux)
+    date_debut=forms.DateField(initial=datetime.date.today)
+    date_fin=forms.DateField(initial=datetime.date.today)
 
     class Meta:
         model = Cours
