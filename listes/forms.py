@@ -128,7 +128,7 @@ class AjouterCours(forms.Form):
 
     class Meta:
         model = Cours
-        fields = ('nom', 'niveaux', 'types', 'professeurs', 'fillieres')
+        fields = ('nom', 'niveaux', 'types')
 
 # class CreerCoursForm(forms.Form):
 #     nom = forms.CharField(label=_('Nom'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
