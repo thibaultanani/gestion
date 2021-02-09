@@ -100,7 +100,7 @@ class Professeur(models.Model):
 class Etudiant(models.Model):
     numEtudiant = models.CharField(max_length=8)
     nom = models.CharField(max_length=100)
-    filieres = models.ManyToManyField(Filiere)
+    prenom = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
     niveaux = ListCharField(
         base_field=models.CharField(
@@ -112,6 +112,7 @@ class Etudiant(models.Model):
         max_length=(2 * 11),
         default=None
     )
+    filieres = models.ManyToManyField(Filiere)
     cours = models.ManyToManyField(Cours)
 
 class UserModelChoiceField(ModelChoiceField):
