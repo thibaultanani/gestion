@@ -70,8 +70,8 @@ class Cours(models.Model):
         choices=Type.choices,
         default=Type.CM,
     )
-    debut = models.IntegerField(datetime.date.today().year)
-    fin = models.IntegerField(datetime.date.today().year + 1)
+    debut = models.DateField(default=None)
+    fin = models.DateField(default=None)
 
 
 class Professeur(models.Model):
