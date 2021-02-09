@@ -10,11 +10,12 @@ from django.contrib.auth.models import User
 
 
 class Admnistrateur(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,default=None)
-    poste = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, default=None)
+    poste = models.CharField(max_length=100, default=None)
 
     def __str__(self):
         return self.poste
+
 
 class Niveau(models.TextChoices):
     L1 = 'L1'
@@ -30,31 +31,31 @@ class Type(models.TextChoices):
 
 
 class Ufr(models.Model):
-    nom = models.CharField(max_length=100)
+    nom = models.CharField(max_length=100, default=None)
 
     def __str__(self):
         return self.nom
 
 
 class Departement(models.Model):
-    nom = models.CharField(max_length=100)
-    ufr = models.ForeignKey(Ufr, on_delete=models.CASCADE)
+    nom = models.CharField(max_length=100, default=None)
+    ufr = models.ForeignKey(Ufr, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return self.nom
 
 
 class Filiere(models.Model):
-    nom = models.CharField(max_length=100)
-    departement = models.ForeignKey(Departement, on_delete=models.CASCADE)
+    nom = models.CharField(max_length=100, default=None)
+    departement = models.ForeignKey(Departement, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return self.nom
 
 
 class Cours(models.Model):
-    nom = models.CharField(max_length=100)
-    filieres = models.ManyToManyField(Filiere)
+    nom = models.CharField(max_length=100, default=None)
+    filieres = models.ManyToManyField(Filiere, default=None)
     niveaux = ListCharField(
         base_field=models.CharField(
             max_length=10,
@@ -98,10 +99,11 @@ class Professeur(models.Model):
 
 
 class Etudiant(models.Model):
-    numEtudiant = models.CharField(max_length=8)
-    nom = models.CharField(max_length=100)
-    filieres = models.ManyToManyField(Filiere)
-    email = models.EmailField(max_length=100)
+    numEtudiant = models.CharField(max_length=8, default=None)
+    nom = models.CharField(max_length=100, default=None)
+    prenom = models.CharField(max_length=100, default=None)
+    filieres = models.ManyToManyField(Filiere, default=None)
+    email = models.EmailField(max_length=100, default=None)
     niveaux = ListCharField(
         base_field=models.CharField(
             max_length=10,
@@ -114,9 +116,11 @@ class Etudiant(models.Model):
     )
     cours = models.ManyToManyField(Cours)
 
+
 class UserModelChoiceField(ModelChoiceField):
     def label_from_instance(self, User):
          return User.get_full_name()
+
 
 class Document(models.Model):
     docfile = models.FileField(upload_to='documents/%Y/%m/%d')
