@@ -10,7 +10,7 @@
     <button type="button"><a href="{% url 'admin_professeur' admin.id %}" class="btn btn-primary">Retour</a></button>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
 
-    <form action="{% url 'admin_modifier_professeur' user.id admin.id%}" method="post" enctype="multipart/form-data">{% csrf_token %}
+    <form action="{% url 'admin_modifier_professeur' admin.id user.id%}" method="post" enctype="multipart/form-data">{% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>

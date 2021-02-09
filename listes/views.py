@@ -117,6 +117,7 @@ def admin_professeur(request, user_id):
                 professeur_all[i]['email'] = user_obj.email
                 listProfesseur.append(professeur_all[i])
             render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
+            return HttpResponseRedirect('listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
     else:
         print("echec3")
         form = DocumentForm()
@@ -160,9 +161,11 @@ def modif_mdp(request, user_id):
 
 
 def admin_modifier_professeur(request, user_id, prof_id):
+    print('user_id', user_id)
+    print('prof_id', prof_id)
     user = get_object_or_404(User, id=prof_id)
     admin = get_object_or_404(User, id=user_id)
-    prof = Professeur.objects.get(user=user)
+    prof = Professeur.objects.get(id=prof_id)
     print("SALUT")
     if request.method == "POST":
         form = ModifierProfesseur(request.POST, initial={"nom": user.last_name,
