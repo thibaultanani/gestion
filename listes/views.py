@@ -139,6 +139,7 @@ def admin_professeur(request, user_id):
                 professeur_all[i]['email'] = user_obj.email
                 listProfesseur.append(professeur_all[i])
             render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
+            return HttpResponseRedirect('listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
     else:
         print("echec3")
         form = DocumentForm()
@@ -182,9 +183,11 @@ def modif_mdp(request, user_id):
 
 
 def admin_modifier_professeur(request, user_id, prof_id):
+    print('user_id', user_id)
+    print('prof_id', prof_id)
     user = get_object_or_404(User, id=prof_id)
     admin = get_object_or_404(User, id=user_id)
-    prof = Professeur.objects.get(user=user)
+    prof = Professeur.objects.get(id=prof_id)
     print("SALUT")
     if request.method == "POST":
         form = ModifierProfesseur(request.POST, initial={"nom": user.last_name,
@@ -268,9 +271,12 @@ def admin_creer_professeur(request, user_id):
 
 def admin_etudiant(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    etudiant_all = Etudiant.objects.all().values()
+    etudiant_all = Etudiant.objects.all()
     print(etudiant_all)
     print(list(etudiant_all))
+
+    print(Etudiant.objects.get(id=3).filieres.all())
+    print(";;;;;;")
 
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
@@ -283,11 +289,11 @@ def admin_etudiant(request, user_id):
                 read_etu_xlsx_file(newdoc.docfile)
             # Redirect to the document list after POST
             print("good")
-            etudiant_all = Etudiant.objects.all().values()
+            etudiant_all = Etudiant.objects.all()
+
             return render(request, 'listes/admin_etudiant.html',
                           {'user': user, 'form': form, "data": list(etudiant_all)})
     else:
-        print("echec3")
         form = DocumentForm()
     return render(request, 'listes/admin_etudiant.html', {'user': user, 'form': form, "data": list(etudiant_all)})
 
@@ -368,10 +374,10 @@ def read_etu_csv_file(file):
     print("JE SUIS UN CSV")
     # TODO : ajouter un mot de passe pour les utilisateurs crées
     for index, row in mon_fichier.iterrows():
-        if row['Niveau 1'] in check_list:
+        if row['Niveau 1'] in check_list and Filiere.objects.filter(nom=str(row['Filiere 1']).upper()).exists():
             niveaux = []
             niveaux.append(row['Niveau 1'])
-            if row['Niveau 2']:
+            if row['Niveau 2'] in check_list:
                 niveaux.append(row['Niveau 2'])
             etudiant, cree1 = Etudiant.objects.get_or_create(
                 numEtudiant=row["Numero Etudiant"],
@@ -381,6 +387,9 @@ def read_etu_csv_file(file):
                           'niveaux': niveaux,
                           }
             )
+            etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 1']).upper()))
+            if Filiere.objects.filter(nom=str(row['Filiere 2']).upper()).exists():
+                etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 2']).upper()))
             print(cree1)
 
 
@@ -391,10 +400,10 @@ def read_etu_xlsx_file(file):
     print("JE SUIS UN XLSX")
     # TODO : ajouter un mot de passe pour les utilisateurs crées
     for index, row in mon_fichier.iterrows():
-        if row['Niveau 1'] in check_list:
+        if row['Niveau 1'] in check_list and Filiere.objects.filter(nom=str(row['Filiere 1']).upper()).exists():
             niveaux = []
             niveaux.append(row['Niveau 1'])
-            if row['Niveau 2']:
+            if row['Niveau 2'] in check_list:
                 niveaux.append(row['Niveau 2'])
             etudiant, cree1 = Etudiant.objects.get_or_create(
                 numEtudiant=row["Numero Etudiant"],
@@ -404,6 +413,9 @@ def read_etu_xlsx_file(file):
                           'niveaux': niveaux,
                           }
             )
+            etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 1']).upper()))
+            if Filiere.objects.filter(nom=str(row['Filiere 2']).upper()).exists():
+                etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 2']).upper()))
             print(cree1)
 
 
@@ -454,6 +466,13 @@ def export_etudiant_xlsx(request):
         df = pd.DataFrame(list(etudiant_all))
         writer = pd.ExcelWriter(b, engine='openpyxl')
         df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+        filiere_list = []
+        for etu in Etudiant.objects.all():
+            filiere_list.append(list(etu.filieres.all()))
+        print(filiere_list)
+        df2 = pd.DataFrame(filiere_list)
+        df['Filiere 1'] = df2[0]
+        df['Filiere 2'] = df2[1]
         df = df.replace(np.nan, '', regex=True)
         df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
         print(df)
@@ -473,6 +492,13 @@ def export_etudiant_csv(request):
     response['Content-Disposition'] = 'attachment; filename=liste_etudiant.csv'
     df = pd.DataFrame(list(etudiant_all))
     df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+    filiere_list = []
+    for etu in Etudiant.objects.all():
+        filiere_list.append(list(etu.filieres.all()))
+    print(filiere_list)
+    df2 = pd.DataFrame(filiere_list)
+    df['Filiere 1'] = df2[0]
+    df['Filiere 2'] = df2[1]
     df = df.replace(np.nan, '', regex=True)
     df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
     print(df)
