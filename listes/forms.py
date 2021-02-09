@@ -98,6 +98,38 @@ class ModifierMdp(ModelForm):
         fields = ('password',)
 
 
+
+class AjouterCours(forms.Form):
+
+    TYPES = [('type1', 'CM'),
+                 ('type2', 'TD')]
+    niveaux=[ ('L1','L1'),
+             ('L2','L2'),
+             ('L3','L3'),
+             ('M1','M1'),
+             ('M2','M2'),
+            ]
+
+    #nb_f = [tuple([x, x]) for x in range(1, 4)]
+    nb= [tuple([x, x]) for x in range(1, 4)]
+    choix = (('1', 'Choix 1'),('2', 'Choix 2'))
+    model = Cours
+    nomCours = forms.CharField(label=_('Nom Cours'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    type= forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect(attrs={'class': "custom-radio-list"}))
+    nb_filliere = forms.IntegerField(label="Fillière(s)", widget=forms.Select(choices=nb))
+    nom_filliere1=forms.ModelChoiceField(queryset=Filiere.objects.all())
+    nom_filliere2=forms.ModelChoiceField(label="",queryset=Filiere.objects.all())
+    nom_filliere3=forms.ModelChoiceField(label="",queryset=Filiere.objects.all())
+    nb_prof=forms.IntegerField(label="", widget=forms.Select(choices=nb))
+    nom_prof1=UserModelChoiceField(label="Professeur(s)",queryset=User.objects.all())
+    nom_prof2=UserModelChoiceField(label="",queryset=User.objects.all(), required=False)
+    nom_prof3=UserModelChoiceField(label="",queryset=User.objects.all(), required=False)
+    Niveau=forms.ChoiceField(label="Niveau",choices=niveaux)
+
+    class Meta:
+        model = Cours
+        fields = ('nom', 'niveaux', 'types')
+
 # class CreerCoursForm(forms.Form):
 #     nom = forms.CharField(label=_('Nom'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
 #     description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False)

@@ -68,16 +68,38 @@ def prof_cursus_etudiant(request, user_id):
     return render(request, 'listes/prof_cursus_etudiant.html', {'user': user})
 
 
-def admin_cours(request):
-    return render(request, 'listes/admin_cours.html')
+def admin_cours(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    return render(request, 'listes/admin_cours.html', {'user': user})
 
 
 def admin_liste_cours(request):
     return render(request, 'listes/admin_informations_cours.html')
 
+def admin_creer_cours(request, user_id):
+  user = get_object_or_404(User, id=user_id)
+  if request.method == "POST":
+     form = AjouterCours(request.POST)
+     if form.is_valid():
+         nomCours = request.POST.get('nomCours', False)
+         type = request.POST.get('type', False)
+         nom_filliere1 = request.POST.get('nom_filliere1', False)
+         nom_filliere2 = request.POST.get('nom_filliere2', False)
+         nom_filliere3 = request.POST.get('nom_filliere3', False)
+         nom_prof1= request.POST.get('nom_prof', False)
+         nom_prof2= request.POST.get('nom_prof', False)
+         nom_prof3= request.POST.get('nom_prof', False)
 
-def admin_creer_cours(request):
-    return render(request, 'listes/admin_creer_cours.html')
+     else:
+       print("echec")
+       messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
+     return render(request, 'listes/admin_creer_cours.html', {'user': user,'form': form})
+  else:
+        print("echec2")
+        form = AjouterCours()
+  return render(request, 'listes/admin_creer_cours.html', {'user': user,'form': form})
+
 
 
 def admin_modifier_cours(request):

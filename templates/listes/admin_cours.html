@@ -6,7 +6,8 @@
 </head>
 <body>
     <h1>Liste des cours </h1>
-    <button type="button"><a href="{% url 'admin_creer_cours' %}" class="btn btn-primary"> Créer un cours</a></button><br><br>
+
+    <button type="button"><a href="{% url 'admin_creer_cours' user.id %}" class="btn btn-primary"> Créer un cours</a></button><br><br>
     <button type="button"><a href="{% url 'admin_liste_cours' %}" class="btn btn-primary">Cours X</a></button>
     <button type="button"><a href="{% url 'admin_modifier_cours' %}" class="btn btn-primary">Modifier cours X</a></button><br>
     <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
