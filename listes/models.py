@@ -1,8 +1,8 @@
 from django.db import models
+from django.db.models.functions import Concat
+from django.forms import ModelChoiceField
 from django_mysql.models import ListCharField
 from django.utils import timezone
-
-# Create your models here.
 import datetime
 from django.contrib.auth.models import User
 
@@ -19,7 +19,6 @@ class Admnistrateur(models.Model):
 
 class Professeur(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, default=None)
-
     DOCTORANT = 'Doctorant'
     MAITRES_DE_CONFERENCES = 'Maître de conférences'
     PROF_DES_UNIVERSITES = 'Professeur des universités'
@@ -93,7 +92,6 @@ class Type(models.TextChoices):
 
 class Cours(models.Model):
     nom = models.CharField(max_length=100)
-    prenom = models.CharField(max_length=100)
     niveaux = ListCharField(
         base_field=models.CharField(
             max_length=10,
@@ -111,4 +109,7 @@ class Cours(models.Model):
     debut = models.IntegerField(datetime.date.today().year)
     fin = models.IntegerField(datetime.date.today().year + 1)
 
+class UserModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, User):
+         return User.get_full_name()
 
