@@ -7,6 +7,8 @@
 </head>
 <body>
     <h1>Creer un cours </h1>
+        <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
+
  <form method="POST" class="post-form">{% csrf_token %}
 <div>
     <p STYLE="padding:0 0 0 20px;">Nom du Cours</p>
@@ -84,5 +86,4 @@
  </form>
 
 </body>
-
 </html>

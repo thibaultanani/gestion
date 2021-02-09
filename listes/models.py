@@ -7,8 +7,6 @@ import datetime
 from django.contrib.auth.models import User
 
 
-
-
 class Admnistrateur(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,default=None)
     poste = models.CharField(max_length=100)
@@ -112,4 +110,8 @@ class Cours(models.Model):
 class UserModelChoiceField(ModelChoiceField):
     def label_from_instance(self, User):
          return User.get_full_name()
+
+class Document(models.Model):
+    docfile = models.FileField(upload_to='documents/%Y/%m/%d')
+
 

@@ -7,7 +7,12 @@
 <body>
     <h1>Modifier professeur X</h1>
     Formulaire<br>
-    <button type="button"><a href="{% url 'admin_gestion_professeur' user.id %}" class="btn btn-primary">Retour</a></button>
+    <button type="button"><a href="{% url 'admin_professeur' admin.id %}" class="btn btn-primary">Retour</a></button>
+    <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
 
+    <form action="{% url 'admin_modifier_professeur' user.id admin.id%}" method="post" enctype="multipart/form-data">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
 </body>
 </html>

@@ -49,6 +49,56 @@ class AjouterProfesseur(ModelForm):
         model = Professeur
         fields = ('nom', 'prenom', 'email', 'titre')
 
+
+class DocumentForm(forms.Form):
+    docfile = forms.FileField(
+        label='Choisir un fichier',
+        help_text='max. 42 megabytes'
+    )
+
+
+class ModifierProfesseur(ModelForm):
+    nom = forms.CharField(label="nom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    prenom = forms.CharField(label="prenom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.CharField(label="email", max_length=150,
+                               widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
+                                                             'placeholder': 'Email'}))
+
+    DOCTORANT = 'Doctorant'
+    MAITRES_DE_CONFERENCES = 'Maître de conférences'
+    PROF_DES_UNIVERSITES = 'Professeur des universités'
+    TUTEUR = 'Tuteur'
+    AUCUN = 'Aucun'
+
+    titre_choix = (
+        (DOCTORANT, 'Doctorant'),
+        (MAITRES_DE_CONFERENCES, 'Maître de conférences'),
+        (PROF_DES_UNIVERSITES, 'Professeur des universités'),
+        (TUTEUR, 'Tuteur'),
+        (AUCUN, 'Aucun'),
+    )
+
+    titre = forms.ChoiceField(choices=titre_choix)
+
+    class Meta:
+        model = Professeur
+        fields = ('nom', 'prenom', 'email', 'titre')
+
+
+class ModifierMdp(ModelForm):
+    password = forms.CharField(label="ancien mot de passe", max_length=100,
+                               widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    new_password1 = forms.CharField(label="nouveau mot de passe", max_length=100,
+                                    widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    new_password2 = forms.CharField(label="nouveau mot de passe", max_length=100,
+                                    widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ('password',)
+
+
+
 class AjouterCours(forms.Form):
 
     TYPES = [('type1', 'CM'),
@@ -76,11 +126,9 @@ class AjouterCours(forms.Form):
     nom_prof3=UserModelChoiceField(label="",queryset=User.objects.all(), required=False)
     Niveau=forms.ChoiceField(label="Niveau",choices=niveaux)
 
-
     class Meta:
-     model=Cours
-     fields = ('nom','niveaux','types', 'professeurs', 'fillieres')
-
+        model = Cours
+        fields = ('nom', 'niveaux', 'types', 'professeurs', 'fillieres')
 
 # class CreerCoursForm(forms.Form):
 #     nom = forms.CharField(label=_('Nom'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
