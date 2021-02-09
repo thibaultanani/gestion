@@ -87,9 +87,9 @@ def admin_creer_cours(request, user_id):
          nom_filliere1 = request.POST.get('nom_filliere1', False)
          nom_filliere2 = request.POST.get('nom_filliere2', False)
          nom_filliere3 = request.POST.get('nom_filliere3', False)
-         nom_prof1= request.POST.get('nom_prof', False)
-         nom_prof2= request.POST.get('nom_prof', False)
-         nom_prof3= request.POST.get('nom_prof', False)
+         nom_prof1= request.POST.get('nom_prof1', False)
+         nom_prof2= request.POST.get('nom_prof2', False)
+         nom_prof3= request.POST.get('nom_prof3', False)
 
      else:
        print("echec")
