@@ -16,7 +16,7 @@
 </head>
 <body class="hold-transition sidebar-mini">
     <h1>Liste des étudiants </h1>
-     {{ user.first_name }}
+    {{ user.first_name }}
     {{ user.last_name }}
     <button type="button">Importer liste</button><br><br>
     <button type="button"><a href="{% url 'admin_creer_etudiant' user.id %}">Créer étudiant-e</a></button><br><br>
@@ -36,6 +36,7 @@
            <th>Prénom</th>
            <th>Email</th>
            <th>Niveau</th>
+           <th>Filiere</th>
            <th>Action</th>
          </tr>
        </thead>
@@ -51,6 +52,11 @@
                       {% if niv != 'nan' %}
                         {{ niv }}<br>
                       {% endif %}
+                  {% endfor %}
+              </td>
+              <td>
+                  {% for fil in x.filieres.all %}
+                        {{ fil.nom }}<br>
                   {% endfor %}
               </td>
               <td>
