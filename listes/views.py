@@ -187,7 +187,7 @@ def admin_modifier_professeur(request, user_id, prof_id):
     print('prof_id', prof_id)
     user = get_object_or_404(User, id=prof_id)
     admin = get_object_or_404(User, id=user_id)
-    prof = Professeur.objects.get(id=prof_id)
+    prof = Professeur.objects.get(user_id=prof_id)
     print("SALUT")
     if request.method == "POST":
         form = ModifierProfesseur(request.POST, initial={"nom": user.last_name,
@@ -316,9 +316,50 @@ def admin_cursus_etudiant(request,user_id,etu_id):
 
 
 def admin_switch_cours_etudiant(request,user_id,etu_id):
-    user = get_object_or_404(User, id=user_id)
+    admin = get_object_or_404(User, id=user_id)
     etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_switch_cours_etudiant.html',{'user':user,'etu':etu})
+    cours_all = Cours.objects.all().filter(niveaux__in=etu.niveaux, filieres__in=etu.filieres.all())
+    print(etu)
+    print(etu.niveaux)
+    print(etu.nom)
+    print(cours_all)
+    print(etu.cours.all())
+    cours_etu = []
+    for cours in cours_all:
+        if cours in etu.cours.all():
+            cours_etu.append(1)
+        else:
+            cours_etu.append(0)
+    print(cours_etu)
+    if request.method == "POST":
+        form = SwitchForm(request.POST)
+        print(request.POST.getlist('choices'))
+        if request.POST.getlist('choices'):
+            for cours in cours_all:
+                print(cours)
+                if str(cours.id) in request.POST.getlist('choices'):
+                    etu.cours.add(get_object_or_404(Cours, id=cours.id))
+                    print("ajout: ", cours.id)
+                else:
+                    etu.cours.remove(get_object_or_404(Cours, id=cours.id))
+                    print("enlever: ", cours.id)
+                print("OK1")
+        else:
+            etu.cours.clear()
+            print("etu cours", etu.cours)
+            print("OK2")
+        cours_etu = []
+        for cours in cours_all:
+            if cours in etu.cours.all():
+                cours_etu.append(1)
+            else:
+                cours_etu.append(0)
+        return render(request, 'listes/admin_switch_cours_etudiant.html', {'user': admin, 'etu': etu, 'form': form,
+                                                                           "data": zip(list(cours_all), cours_etu)})
+    else:
+        form = SwitchForm()
+    return render(request, 'listes/admin_switch_cours_etudiant.html', {'user': admin, 'etu': etu, 'form': form,
+                                                                       "data": zip(list(cours_all), cours_etu)})
 
 
 def read_csv_file(file):
@@ -540,3 +581,4 @@ def admin_supprimer_etudiant(request, user_id, etu_id):
     form = DocumentForm()
 
     return render(request, 'listes/admin_etudiant.html', {'user': admin, 'form': form, "data": list(etudiant_all)})
+
