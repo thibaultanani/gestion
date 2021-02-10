@@ -56,15 +56,12 @@ class Filiere(models.Model):
 class Cours(models.Model):
     nom = models.CharField(max_length=100, default=None)
     filieres = models.ManyToManyField(Filiere, default=None)
-    niveaux = ListCharField(
-        base_field=models.CharField(
-            max_length=10,
+    niveaux = models.CharField(
+            max_length=100,
             choices=Niveau.choices,
             default=Niveau.L1,
-        ),
-        size=2,
-        max_length=(2 * 11)
-    )
+        )
+
     types = models.CharField(
         max_length=100,
         choices=Type.choices,
@@ -72,6 +69,8 @@ class Cours(models.Model):
     )
     debut = models.DateField(default=None)
     fin = models.DateField(default=None)
+    def __str__(self):
+        return self.nom
 
 
 class Professeur(models.Model):
@@ -94,8 +93,10 @@ class Professeur(models.Model):
     titre = models.CharField(max_length=100, choices=titre_choix, default=AUCUN)
     cours = models.ManyToManyField(Cours)
 
+    #def __str__(self):
+     #return self.titre
     def __str__(self):
-        return self.titre
+      return self.user.get_full_name()
 
 
 class Etudiant(models.Model):
@@ -119,7 +120,7 @@ class Etudiant(models.Model):
 
 class UserModelChoiceField(ModelChoiceField):
     def label_from_instance(self, User):
-         return User.get_full_name()
+        return User.get_full_name()
 
 
 class Document(models.Model):
