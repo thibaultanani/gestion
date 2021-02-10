@@ -38,6 +38,7 @@ def connexion(request):
         form = ConnexionForm()
     return render(request, 'listes/login.html', {'form': form})
 
+
 def deconnexion(request):
     logout(request)
     return render(request, 'listes/login.html')
@@ -48,7 +49,6 @@ def accueil_admin(request, user_object):
     user = get_object_or_404(User, id=user_object.id)
     print(user.first_name)
     return render(request, 'listes/accueil_admin.html', {'user': user})
-
 
 
 @login_required(login_url="/connexion")
@@ -72,7 +72,6 @@ def admin_cours(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
     return render(request, 'listes/admin_cours.html', {'user': user})
-
 
 
 def admin_liste_cours(request):
@@ -100,7 +99,6 @@ def admin_creer_cours(request, user_id):
         print("echec2")
         form = AjouterCours()
   return render(request, 'listes/admin_creer_cours.html', {'user': user,'form': form})
-
 
 
 
@@ -146,7 +144,6 @@ def admin_professeur(request, user_id):
         print("echec3")
         form = DocumentForm()
     return render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
-
 
 
 def modif_mdp(request, user_id):
@@ -236,7 +233,6 @@ def admin_modifier_professeur(request, user_id, prof_id):
     return render(request, 'listes/admin_modifier_professeur.html', {'user': user, 'admin': admin, 'form': form})
 
 
-
 def admin_creer_professeur(request, user_id):
     user = get_object_or_404(User, id=user_id)
     print(user.first_name)
@@ -273,42 +269,11 @@ def admin_creer_professeur(request, user_id):
     return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
 
 
-def admin_creer_etudiant(request):
-    if request.method == "POST":
-        form = AjouterEtudiant(request.POST)
-        if form.is_valid():
-            numEtu = request.POST.get('numEtudiant', False)
-            nom = request.POST.get('nom', False)
-            prenom = request.POST.get('prenom', False)
-            email = request.POST.get('email', False)
-            niveaux = [request.POST.get('niveaux', False), request.POST.get('niveaux2', False)]
-
-            etudiant = Etudiant(numEtudiant=numEtu, nom=nom, prenom=prenom, email=email, niveaux=niveaux)
-            etudiant.save()
-
-            print('#####')
-            print(etudiant)
-            print('#####')
-            messages.success(request, 'Un nouvelle étudiant a été créé')
-            return render(request, 'listes/admin_etudiant.html')
-        else:
-            print("echec")
-            messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
-        return render(request, 'listes/admin_creer_etudiant.html', {'form': form})
-    else:
-        print("echec2")
-        form = AjouterEtudiant()
-    return render(request, 'listes/admin_creer_etudiant.html', {'form': form})
-
-
 def admin_etudiant(request, user_id):
     user = get_object_or_404(User, id=user_id)
     etudiant_all = Etudiant.objects.all()
     print(etudiant_all)
     print(list(etudiant_all))
-
-    print(Etudiant.objects.get(id=3).filieres.all())
-    print(";;;;;;")
 
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
@@ -325,9 +290,46 @@ def admin_etudiant(request, user_id):
 
             return render(request, 'listes/admin_etudiant.html',
                           {'user': user, 'form': form, "data": list(etudiant_all)})
-            else:
-            form = DocumentForm()
-        return render(request, 'listes/admin_etudiant.html', {'user': user, 'form': form, "data": list(etudiant_all)})
+    else:
+        form = DocumentForm()
+    return render(request, 'listes/admin_etudiant.html', {'user': user, 'form': form, "data": list(etudiant_all)})
+
+
+def admin_creer_etudiant(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == "POST":
+        form = AjouterEtudiant(request.POST)
+        if form.is_valid():
+            numEtu = request.POST.get('numEtudiant', False)
+            nom = request.POST.get('nom', False)
+            prenom = request.POST.get('prenom', False)
+            email = request.POST.get('email', False)
+            niveaux = [request.POST.get('niveaux', False), request.POST.get('niveaux2', False)]
+
+            etudiant = Etudiant(numEtudiant=numEtu, nom=nom, prenom=prenom, email=email, niveaux=niveaux)
+            etudiant.save()
+            etudiant_all = Etudiant.objects.all()
+
+            print('#####')
+            print(etudiant)
+            print('#####')
+            messages.success(request, 'Un nouvelle étudiant a été créé')
+            return render(request, 'listes/admin_etudiant.html', {'user':user, "data": list(etudiant_all)})
+        else:
+            print("echec")
+            etudiant_all = Etudiant.objects.all()
+            messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
+        return render(request, 'listes/admin_creer_etudiant.html', {'form': form, 'user':user, "data": list(etudiant_all)})
+    else:
+        print("echec2")
+        form = AjouterEtudiant()
+    return render(request, 'listes/admin_creer_etudiant.html', {'form': form,'user':user})
+
+
+def admin_modifier_etudiant(request,user_id,etu_id):
+    user = get_object_or_404(User, id=user_id)
+    etu = get_object_or_404(Etudiant, id=etu_id)
+    return render(request, 'listes/admin_modifier_etudiant.html',{'user':user,'etu':etu})
 
 
 def admin_cursus_etudiant(request,user_id,etu_id):
@@ -341,8 +343,223 @@ def admin_switch_cours_etudiant(request,user_id,etu_id):
     etu = get_object_or_404(Etudiant, id=etu_id)
     return render(request, 'listes/admin_switch_cours_etudiant.html',{'user':user,'etu':etu})
 
-def admin_modifier_etudiant(request,user_id,etu_id):
-    user = get_object_or_404(User, id=user_id)
-    etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_modifier_etudiant.html',{'user':user,'etu':etu})
 
+def read_csv_file(file):
+    mon_fichier = pd.read_csv(file.path, encoding="windows-1252", sep=";")
+    check_list = ['Doctorant', 'Maître de conférences', 'Professeur des universités', 'Tuteur', 'Aucun']
+    print(mon_fichier)
+    print("JE SUIS UN CSV")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row["Titre"] in check_list:
+            utilisateur, cree1 = User.objects.get_or_create(
+                email=row["Email"],
+                defaults={'first_name': row["Prenom"],
+                          'last_name': row["Nom"],
+                          'username': row["Email"],
+                          }
+            )
+            print(cree1)
+            professeur, cree2 = Professeur.objects.get_or_create(
+                user=utilisateur,
+                defaults={'titre': row["Titre"]}
+            )
+            print(cree2)
+
+
+def read_xlsx_file(file):
+    mon_fichier = pd.read_excel(file.path, engine='openpyxl')
+    check_list = ['Doctorant', 'Maître de conférences', 'Professeur des universités', 'Tuteur', 'Aucun']
+    print(mon_fichier)
+    print("JE SUIS UN XLSX")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row["Titre"] in check_list:
+            utilisateur, cree1 = User.objects.get_or_create(
+                email=row["Email"],
+                defaults={'first_name': row["Prenom"],
+                          'last_name': row["Nom"],
+                          'username': row["Email"],
+                          }
+            )
+            print(cree1)
+            professeur, cree2 = Professeur.objects.get_or_create(
+                user=utilisateur,
+                defaults={'titre': row["Titre"]}
+            )
+            print(cree2)
+
+
+def read_etu_csv_file(file):
+    mon_fichier = pd.read_csv(file.path, encoding="windows-1252", sep=";")
+    check_list = ['L1', 'L2', 'L3', 'M1', 'M2']
+    print(mon_fichier)
+    print("JE SUIS UN CSV")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row['Niveau 1'] in check_list and Filiere.objects.filter(nom=str(row['Filiere 1']).upper()).exists():
+            niveaux = []
+            niveaux.append(row['Niveau 1'])
+            if row['Niveau 2'] in check_list:
+                niveaux.append(row['Niveau 2'])
+            etudiant, cree1 = Etudiant.objects.get_or_create(
+                numEtudiant=row["Numero Etudiant"],
+                email=row["Email"],
+                defaults={'nom': row["Nom"],
+                          'prenom': row["Prenom"],
+                          'niveaux': niveaux,
+                          }
+            )
+            etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 1']).upper()))
+            if Filiere.objects.filter(nom=str(row['Filiere 2']).upper()).exists():
+                etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 2']).upper()))
+            print(cree1)
+
+
+def read_etu_xlsx_file(file):
+    mon_fichier = pd.read_excel(file.path, engine='openpyxl')
+    check_list = ['L1', 'L2', 'L3', 'M1', 'M2']
+    print(mon_fichier)
+    print("JE SUIS UN XLSX")
+    # TODO : ajouter un mot de passe pour les utilisateurs crées
+    for index, row in mon_fichier.iterrows():
+        if row['Niveau 1'] in check_list and Filiere.objects.filter(nom=str(row['Filiere 1']).upper()).exists():
+            niveaux = []
+            niveaux.append(row['Niveau 1'])
+            if row['Niveau 2'] in check_list:
+                niveaux.append(row['Niveau 2'])
+            etudiant, cree1 = Etudiant.objects.get_or_create(
+                numEtudiant=row["Numero Etudiant"],
+                email=row["Email"],
+                defaults={'nom': row["Nom"],
+                          'prenom': row["Prenom"],
+                          'niveaux': niveaux,
+                          }
+            )
+            etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 1']).upper()))
+            if Filiere.objects.filter(nom=str(row['Filiere 2']).upper()).exists():
+                etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 2']).upper()))
+            print(cree1)
+
+
+def export_professeur_xlsx(request):
+    professeur_all = Professeur.objects.all().values()
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+    print(listProfesseur)
+    with BytesIO() as b:
+        df = pd.DataFrame(listProfesseur)
+        writer = pd.ExcelWriter(b, engine='openpyxl')
+        df.to_excel(writer, index=False)
+        writer.save()
+        response = HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=liste_professeur.xlsx'
+        return response
+
+
+def export_professeur_csv(request):
+    professeur_all = Professeur.objects.all().values()
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+    print(listProfesseur)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=liste_professeur.csv'
+    df = pd.DataFrame(listProfesseur)
+    df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
+    return response
+
+
+def export_etudiant_xlsx(request):
+    etudiant_all = Etudiant.objects.all().values()
+    print(etudiant_all)
+    print(list(etudiant_all))
+    with BytesIO() as b:
+        df = pd.DataFrame(list(etudiant_all))
+        writer = pd.ExcelWriter(b, engine='openpyxl')
+        df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+        filiere_list = []
+        for etu in Etudiant.objects.all():
+            filiere_list.append(list(etu.filieres.all()))
+        print(filiere_list)
+        df2 = pd.DataFrame(filiere_list)
+        df['Filiere 1'] = df2[0]
+        df['Filiere 2'] = df2[1]
+        df = df.replace(np.nan, '', regex=True)
+        df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
+        print(df)
+        df.drop('niveaux', inplace=True, axis=1)
+        df.to_excel(writer, index=False)
+        writer.save()
+        response = HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=liste_etudiant.xlsx'
+        return response
+
+
+def export_etudiant_csv(request):
+    etudiant_all = Etudiant.objects.all().values()
+    print(etudiant_all)
+    print(list(etudiant_all))
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=liste_etudiant.csv'
+    df = pd.DataFrame(list(etudiant_all))
+    df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+    filiere_list = []
+    for etu in Etudiant.objects.all():
+        filiere_list.append(list(etu.filieres.all()))
+    print(filiere_list)
+    df2 = pd.DataFrame(filiere_list)
+    df['Filiere 1'] = df2[0]
+    df['Filiere 2'] = df2[1]
+    df = df.replace(np.nan, '', regex=True)
+    df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
+    print(df)
+    df.drop('niveaux', inplace=True, axis=1)
+    df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
+    return response
+
+
+def admin_supprimer_professeur(request, user_id, prof_id):
+    user = get_object_or_404(User, id=prof_id)
+    admin = get_object_or_404(User, id=user_id)
+    prof = Professeur.objects.get(user=user)
+    prof.delete()
+    user.delete()
+
+    professeur_all = Professeur.objects.all().values()
+    listProfesseur = []
+    for i in range(len(professeur_all)):
+        user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+        professeur_all[i]['username'] = user_obj.username
+        professeur_all[i]['first_name'] = user_obj.first_name
+        professeur_all[i]['last_name'] = user_obj.last_name
+        professeur_all[i]['email'] = user_obj.email
+        listProfesseur.append(professeur_all[i])
+    form = DocumentForm()
+
+    return render(request, 'listes/admin_professeur.html', {'user': admin, 'form': form, "data": list(professeur_all)})
+
+
+def admin_supprimer_etudiant(request, user_id, etu_id):
+    admin = get_object_or_404(User, id=user_id)
+    etu = Etudiant.objects.get(id=etu_id)
+    etu.delete()
+
+    etudiant_all = Etudiant.objects.all().values()
+    print(etudiant_all)
+    print(list(etudiant_all))
+
+    form = DocumentForm()
+
+    return render(request, 'listes/admin_etudiant.html', {'user': admin, 'form': form, "data": list(etudiant_all)})
