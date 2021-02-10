@@ -193,3 +193,10 @@ class AjouterCours(forms.Form):
 #
 #     def save(self, user):
 #
+
+
+class SwitchForm(forms.Form):
+    choices = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+    )
+
