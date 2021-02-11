@@ -45,10 +45,10 @@ def deconnexion(request):
 
 
 @login_required(login_url="/connexion")
-def accueil_admin(request, user_object):
-    user = get_object_or_404(User, id=user_object.id)
+def accueil_admin(request, user_id):
+    user = get_object_or_404(User, id=user_id)
     print(user.first_name)
-    return render(request, 'listes/accueil_admin.html', {'user': user})
+    return render(request, 'listes/accueil_admin.html', {'user_object': user})
 
 
 @login_required(login_url="/connexion")
@@ -160,7 +160,7 @@ def modif_mdp(request, user_id):
                     if check_password(old_mdp, user_mdp.password):
                         user_mdp.set_password(new_mdp)
                         user_mdp.save()
-                        return render(request, 'listes/accueil_professeur.html', {'user': user})
+                        return render(request, 'listes/login.html')
                     else:
                         print("echec-1")
                         messages.error(request, 'L\'ancien mot de passe ne correspond pas')
@@ -230,7 +230,7 @@ def admin_modifier_professeur(request, user_id, prof_id):
                                            "email": user.email,
                                            "titre": prof.titre})
     print("HELLO2")
-    return render(request, 'listes/admin_modifier_professeur.html', {'user': user, 'admin': admin, 'form': form})
+    return render(request, 'listes/admin_modifier_professeur.html', {'user': admin, 'etu': user, 'form': form})
 
 
 def admin_creer_professeur(request, user_id):
@@ -243,7 +243,7 @@ def admin_creer_professeur(request, user_id):
             nom = request.POST.get('nom', False)
             email = request.POST.get('email', False)
             titre = request.POST.get('titre', False)
-            password=make_password('test1234')
+            password = make_password('test1234')
 
             utilisateur = User(first_name=prenom, last_name=nom, email=email,
                                username=email, password=password)
@@ -262,7 +262,18 @@ def admin_creer_professeur(request, user_id):
         else:
             print("echec")
             messages.error(request, 'Erreur lors de l\'ajout, réesayez plus tard')
-        return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
+        professeur_all = Professeur.objects.all().values()
+        listProfesseur = []
+        for i in range(len(professeur_all)):
+            user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+            professeur_all[i]['username'] = user_obj.username
+            professeur_all[i]['first_name'] = user_obj.first_name
+            professeur_all[i]['last_name'] = user_obj.last_name
+            professeur_all[i]['email'] = user_obj.email
+            listProfesseur.append(professeur_all[i])
+        form = DocumentForm()
+        return render(request, 'listes/admin_professeur.html',
+                                    {'user': user, 'form': form, "data": list(professeur_all)})
     else:
         print("echec2")
         form = AjouterProfesseur()

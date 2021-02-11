@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from .forms import ConnexionForm
 
 urlpatterns = [
-    url(r'^accueil_admin/(?P<user_object>[0-9]+)/', views.accueil_admin, name='accueil_admin'),
+    url(r'^accueil_admin/(?P<user_id>[0-9]+)/', views.accueil_admin, name='accueil_admin'),
     url(r'^accueil_professeur/(?P<user_id>[0-9]+)/', views.accueil_professeur, name='accueil_professeur'),
     url(r'^prof_liste_etudiant/(?P<user_id>[0-9]+)/', views.prof_liste_etudiant, name='prof_liste_etudiant'),
     url(r'^prof_cursus_etudiant/(?P<user_id>[0-9]+)/', views.prof_cursus_etudiant, name='prof_cursus_etudiant'),

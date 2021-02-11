@@ -75,12 +75,11 @@ class AjouterEtudiant(ModelForm):
 
 
 class AjouterProfesseur(ModelForm):
-    nom = forms.CharField(label="nom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    prenom = forms.CharField(label="prenom", max_length=100,
+    nom = forms.CharField(label="Nom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    prenom = forms.CharField(label="Prénom", max_length=100,
                              widget=forms.TextInput(attrs={'class': 'form-control'}))
-    email = forms.CharField(label="email", max_length=150,
-                            widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
-                                                          'placeholder': 'Email'}))
+    email = forms.CharField(label="Email", max_length=150,
+                            widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email'}))
 
     DOCTORANT = 'Doctorant'
     MAITRES_DE_CONFERENCES = 'Maître de conférences'
