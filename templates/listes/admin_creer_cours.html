@@ -1,89 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <head>
     <meta charset="UTF-8">
     <title>Création de cours</title>
 </head>
 <body>
-    <h1>Creer un cours </h1>
-        <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
+    <h1>Créer cours </h1>
+    <button type="button"><a href="{% url 'admin_cours' user.id %}" class="btn btn-primary">Retour</a></button>
+    <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
 
- <form method="POST" class="post-form">{% csrf_token %}
-<div>
-    <p STYLE="padding:0 0 0 20px;">Nom du Cours</p>
-    <p STYLE="padding:0 0 0 20px;" for="">{{form.nomCours }}</p>
-  </div>
-  <div>
-      <p STYLE="padding:0 0 0 20px;">Type</p>
-      <p   list-style=none STYLE="padding:0 0 0 20px;">{{form.type }}</p>
-  </div>
- <div>
-    <p STYLE="padding:0 0 0 20px;">Fillière(s)</p>
-    <label STYLE="padding:0 0 0 20px;" for="">{{form.nb_filliere}}</label>  <label STYLE="padding:0 0 0 20px;"for="">{{form.nom_filliere1}}</label>
-     <p STYLE="padding:0 0 0 80px;" for="">{{form.nom_filliere2}}</p>
-     <p STYLE="padding:0 0 0 80px;" for="">{{form.nom_filliere3}}</p>
-  </div>
-<div>
-    <p STYLE="padding:0 0 0 20px;">Professeur(s)</p>
-    <label STYLE="padding:0 0 0 20px;" for="">{{form.nb_prof}}</label> <label STYLE="padding:0 0 0 20px;" for="">{{form.nom_prof1}}</label>
-    <p STYLE="padding:0 0 0 80px;" for="">{{form.nom_prof2}}</p>
-    <p STYLE="padding:0 0 0 80px;" for="">{{form.nom_prof3}}</p>
-  </div>
-
-  <div>
-      <p STYLE="padding:0 0 0 20px;">Niveau</p>
-      <p STYLE="padding:0 0 0 20px;" for="">{{form.Niveau}}</p>
-  </div>
-  <div>
-    <p STYLE="padding:0 0 0 20px;">  <button type="submit" class="save btn btn-default">Save</button>
-      <button ><a href="{% url 'admin_cours' user.id %}" class="btn btn-primary">Retour</a></button></div></p>
-         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script>
-    $(function(){
-        function hideInputs_prof() {
-            $("#id_nom_prof2").hide()
-            $("#id_nom_prof3").hide();
-        }
-         function hideInputs_filliere() {
-            $("#id_nom_filliere2").hide();
-            $("#id_nom_filliere3").hide();
-        }
-
-        $("#id_nb_prof").on('change', function(){
-            var val = $("#id_nb_prof").val();
-            if (val == '2') {
-                $("#id_nom_prof2").show();
-                $("#id_nom_prof3").hide();
-            }
-            else if (val == '3') {
-                $("#id_nom_prof2").show();
-                $("#id_nom_prof3").show();}
-            else {
-                hideInputs_prof();
-            }
-        });
-
-        $("#id_nb_filliere").on('change', function(){
-            var val = $("#id_nb_filliere").val();
-            if (val == '2') {
-                $("#id_nom_filliere2").show();
-                $("#id_nom_filliere3").hide();
-            }
-            else if (val == '3') {
-                $("#id_nom_filliere2").show();
-                $("#id_nom_filliere3").show();}
-            else {
-                hideInputs_filliere();
-            }
-        });
-
-
-        hideInputs_prof();
-        hideInputs_filliere()
-    });
-    </script>
- </form>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
 
 </body>
 </html>
