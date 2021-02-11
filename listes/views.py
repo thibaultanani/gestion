@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from .models import *
 from io import BytesIO
+from django.db.models import Q, Value
+
 
 import numpy as np
 import pandas as pd
@@ -55,6 +57,7 @@ def home_professeur(request,user_id):
     user=get_object_or_404(User,id=user_id)
     return render(request, 'listes/home_prof.html', {'user': user,})
 
+@login_required(login_url="/connexion")
 def accueil_professeur(request, user_id):
     print("YOO")
     user = get_object_or_404(User, id=user_id)
@@ -84,9 +87,17 @@ def prof_cursus_etudiant(request, user_id,cours_id,etu_id):
 
 def admin_cours(request, user_id):
     user = get_object_or_404(User, id=user_id)
+    cours_all = Cours.objects.all()
+    print(cours_all)
+    print(list(cours_all))
 
-    return render(request, 'listes/admin_cours.html', {'user': user})
-
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            return render(request, 'listes/admin_cours.html',{'user': user, 'form': form, "data": list(cours_all)})
+    else:
+        form = DocumentForm()
+    return render(request, 'listes/admin_cours.html', {'user': user, 'form': form, "data": list(cours_all)})
 
 def admin_liste_cours(request):
     return render(request, 'listes/admin_informations_cours.html')
@@ -98,26 +109,187 @@ def admin_creer_cours(request, user_id):
      if form.is_valid():
          nomCours = request.POST.get('nomCours', False)
          type = request.POST.get('type', False)
-         nom_filliere1 = request.POST.get('nom_filliere1', False)
-         nom_filliere2 = request.POST.get('nom_filliere2', False)
-         nom_filliere3 = request.POST.get('nom_filliere3', False)
-         nom_prof1= request.POST.get('nom_prof', False)
-         nom_prof2= request.POST.get('nom_prof', False)
-         nom_prof3= request.POST.get('nom_prof', False)
+         filliere1 = request.POST.get('nom_filliere1', False)
+         filliere2 = request.POST.get('nom_filliere2', False)
+         filliere3 = request.POST.get('nom_filliere3', False)
+         professeur1=request.POST.get('nom_prof1', False)
+         professeur2=request.POST.get('nom_prof2', False)
+         professeur3=request.POST.get('nom_prof3', False)
+         niveau=request.POST.get('Niveau', False)
+         debut=request.POST.get('date_debut',False)
+         fin=request.POST.get('date_fin',False)
+
+         prof1 = Professeur.objects.get(id=professeur1)
+
+         #user3 = User.objects.get(id=professeur3)
+         #professeur1 = Professeur.objects.get(user=user1)
+         #professeur3 = Professeur.objects.get(user=user3)
+         cours= Cours(nom=nomCours,niveaux=niveau,types=type,debut=debut,fin=fin)
+         cours.save()
+         cours.filieres.add(filliere1)
+         #cours.filieres.add(filliere2)
+         #cours.filieres.add(filliere3)
+         prof1.cours.add(cours)
+         #professeur3.cours.add(cours)
+
+         if filliere2:
+            cours.filieres.add(filliere2)
+         else:
+            print('filliere2 vide')
+
+         if filliere3:
+            cours.filieres.add(filliere3)
+         else:
+            print('filliere 3 vide')
+
+         if professeur2:
+           prof2=Professeur.objects.get(id=professeur2)
+          # prof2 = Professeur.objects.get(user=user2)
+           prof2.cours.add(cours)
+
+         else :
+            print('prof2 vide')
+
+         if professeur3:
+             prof3 = Professeur.objects.get(id=professeur3)
+             #prof3 = Professeur.objects.get(user=user3)
+             prof3.cours.add(cours)
+
+         else:
+             print('prof3 vide')
+
+
+         print('##########')
+         print('utilisateur',user)
+         print('Mon cours',cours)
+         print('############')
+         print()
 
      else:
-       print("echec")
-       messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
+      nomCours = request.POST.get('nomCours', False)
+      messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
      return render(request, 'listes/admin_creer_cours.html', {'user': user,'form': form})
   else:
-        print("echec2")
+        print("echec ajout")
         form = AjouterCours()
   return render(request, 'listes/admin_creer_cours.html', {'user': user,'form': form})
 
 
 
-def admin_modifier_cours(request):
-    return render(request, 'listes/admin_modifier_cours.html')
+def admin_modifier_cours(request,user_id, cours_id):
+    user = get_object_or_404(User, id=user_id)
+    cours = get_object_or_404(Cours, id=cours_id)
+    if len(cours.filieres.all())==2:
+        fil2=cours.filieres.all()[1]
+        fil3=""
+
+    elif len(cours.filieres.all())==3:
+        fil2=cours.filieres.all()[1]
+        fil3 = cours.filieres.all()[2]
+
+    else:
+        fil2="2"
+        fil3=""
+
+    if len(Professeur.objects.filter(cours=cours)) == 2:
+        prof2 = Professeur.objects.filter(cours=cours)[1]
+        prof3=""
+
+    elif len(Professeur.objects.filter(cours=cours)) == 3:
+        prof2 = Professeur.objects.filter(cours=cours)[1]
+        prof3 = Professeur.objects.filter(cours=cours)[2]
+    else:
+        prof2 = ""
+        prof3 = ""
+    if request.method == "POST":
+        form = ModifierCours(request.POST, initial={"nomCours": cours.nom,
+                                                     "type": cours.types,
+                                                      "nom_filliere1": cours.filieres.all()[0],
+                                                       "nom_filliere2": fil2,
+                                                       "nom_filliere3": fil3,
+                                                        "nom_prof1": Professeur.objects.filter(cours=cours)[0],
+                                                         "nom_prof2": prof2,
+                                                          "nom_prof3": prof3,
+                                                          "Niveau": cours.niveaux,
+                                                           "date_debut": cours.debut,
+                                                             "date_fin":cours.fin
+
+
+                                                   })
+        if form.is_valid():
+            nomCours = request.POST.get('nomCours', False)
+            type = request.POST.get('type', False)
+            filliere1 = request.POST.get('nom_filliere1', False)
+            filliere2 = request.POST.get('nom_filliere2', False)
+            filliere3 = request.POST.get('nom_filliere3', False)
+            professeur1 = request.POST.get('nom_prof1', False)
+            professeur2 = request.POST.get('nom_prof2', False)
+            professeur3 = request.POST.get('nom_prof3', False)
+            niveau = request.POST.get('Niveau', False)
+            debut = request.POST.get('date_debut', False)
+            fin = request.POST.get('date_fin', False)
+
+            cours.nom=nomCours
+            cours.types=type
+            cours.niveaux=niveau
+            cours.debut=debut
+            cours.fin=fin
+            cours.filieres.clear()
+            cours.filieres.add(filliere1)
+            if filliere2:
+                cours.filieres.add(filliere2)
+            else:
+                print('filliere2 vide')
+
+            if filliere3:
+                cours.filieres.add(filliere3)
+            else:
+                print('filliere 3 vide')
+            cours.save()
+            print(fil2)
+            cours.professeur_set.clear()
+            cours.professeur_set.add(professeur1)
+            if professeur2:
+                cours.professeur_set.add(professeur2)
+
+
+            else:
+                print('prof2 vide')
+
+            if professeur3:
+                cours.professeur_set.add(professeur3)
+
+            else:
+                print('prof3 vide')
+        else:
+          messages.error(request, 'Erreur lors de la modification, réesayez plus tard')
+        print("####")
+        print(user.id)
+        print('mon cours ',cours)
+        print('filièèèèere',cours.filieres.all())
+
+        print("####")
+        return admin_cours(request, user.id)
+
+
+    else:
+        form = ModifierCours(initial={"nomCours": cours.nom,
+                                                     "type": cours.types,
+                                                      "nom_filliere1": cours.filieres.all()[0],
+                                                       "nom_filliere2": fil2,
+                                                       "nom_filliere3": fil3,
+                                                        "nom_prof1": Professeur.objects.filter(cours=cours)[0],
+                                                        "nom_prof2": prof2,
+                                                        "nom_prof3": prof3,
+                                                          "Niveau": cours.niveaux,
+                                                          "date_debut": cours.debut,
+                                                          "date_fin":cours.fin
+
+
+                                                   })
+    print("ici")
+
+    return render(request, 'listes/admin_modifier_cours.html', {'user': user,'cours':cours,'form': form})
 
 
 def admin_professeur(request, user_id):
@@ -325,14 +497,28 @@ def admin_creer_etudiant(request, user_id):
     if request.method == "POST":
         form = AjouterEtudiant(request.POST)
         if form.is_valid():
+            choix_niveau = ["L1","L2","L3","M1","M2"]
             numEtu = request.POST.get('numEtudiant', False)
             nom = request.POST.get('nom', False)
             prenom = request.POST.get('prenom', False)
             email = request.POST.get('email', False)
-            niveaux = [request.POST.get('niveaux', False), request.POST.get('niveaux2', False)]
+            niveaux = [request.POST.get('niveaux', False)]
+            if niveaux[0] not in ["L1","M1","M2"]:
+                if request.POST.get('ajac',False):
+                    index = choix_niveau.index(niveaux[0])
+                    niveaux.append(choix_niveau[index-1])
+                    print(niveaux)
+            filliere = request.POST.get('filliere', False)
+            filliere2 = request.POST.get('filliere2', False)
 
             etudiant = Etudiant(numEtudiant=numEtu, nom=nom, prenom=prenom, email=email, niveaux=niveaux)
             etudiant.save()
+            if filliere2 is "":
+                etudiant.filieres.add(filliere)
+            else:
+                etudiant.filieres.add(filliere)
+                etudiant.filieres.add(filliere2)
+
             etudiant_all = Etudiant.objects.all()
 
             print('#####')
@@ -354,7 +540,91 @@ def admin_creer_etudiant(request, user_id):
 def admin_modifier_etudiant(request,user_id,etu_id):
     user = get_object_or_404(User, id=user_id)
     etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_modifier_etudiant.html',{'user':user,'etu':etu})
+
+    fil = list(etu.filieres.all())
+    if request.method == "POST":
+        if len(fil)==2:
+            print(fil)
+            form = ModifierEtudiant(request.POST, initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                            "prenom": etu.prenom,
+                                                            "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                            "filliere": fil[0],
+                                                           "filliere2": fil[1]})
+        else:
+            form = ModifierEtudiant(request.POST, initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                            "prenom": etu.prenom,
+                                                            "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                            "filliere": fil[0]})
+        if form.is_valid():
+            choix_niveau = ["L1", "L2", "L3", "M1", "M2"]
+            print("id = "+etu_id)
+            numEtu = request.POST.get('numEtudiant', False)
+            nom = request.POST.get('nom', False)
+            prenom = request.POST.get('prenom', False)
+            email = request.POST.get('email', False)
+            niveaux = [request.POST.get('niveaux', False)]
+            if niveaux[0] not in ["L1","M1","M2"]:
+                if request.POST.get('ajac',False):
+                    index = choix_niveau.index(niveaux[0])
+                    niveaux.append(choix_niveau[index-1])
+                    print(niveaux)
+            filliere = request.POST.get('filliere', False)
+            filliere2 = request.POST.get('filliere2', False)
+
+            etudiant_all = Etudiant.objects.all()
+            try:
+                print(Etudiant.objects.get(id=etu_id))
+                user_etu = Etudiant.objects.get(id=etu_id)
+                user_etu.numEtudiant = numEtu
+                user_etu.nom = nom
+                user_etu.prenom = prenom
+                user_etu.email = email
+                user_etu.niveaux = niveaux
+                user_etu.save()
+
+                print("ici 1")
+                user_etu.filieres.clear()
+                print("ici 2")
+                if filliere2 is "":
+                    user_etu.filieres.add(filliere)
+                else:
+                    user_etu.filieres.add(filliere)
+                    user_etu.filieres.add(filliere2)
+
+                etudiant_all = Etudiant.objects.all()
+
+                return render(request, 'listes/admin_etudiant.html', {'user':user, "data": list(etudiant_all)})
+            except:
+                return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user':user, "data": list(etudiant_all)})
+        else:
+            print("echec")
+            messages.error(request, 'Erreur lors de la modification, réesayer plus tard')
+        return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user': user, 'etu': etu})
+    else:
+        print("echec2")
+        print(etu.numEtudiant)
+        print(etu.niveaux)
+        if len(fil) == 2:
+            print(fil)
+            form = ModifierEtudiant(initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                           "prenom": etu.prenom,
+                                                           "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                           "filliere": fil[0],
+                                                           "filliere2": fil[1]})
+        else:
+            form = ModifierEtudiant(initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                           "prenom": etu.prenom,
+                                                           "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                           "filliere": fil[0]})
+    return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user': user, 'etu': etu})
 
 
 def admin_cursus_etudiant(request,user_id,etu_id):
@@ -635,3 +905,25 @@ def admin_supprimer_etudiant(request, user_id, etu_id):
 
     return admin_etudiant(request, user_id)
 
+def admin_supprimer_cours(request, user_id, cours_id):
+    admin = get_object_or_404(User, id=user_id)
+    cours = Cours.objects.get(id=cours_id)
+    cours.delete()
+
+    cours_all = Cours.objects.all()
+    print(cours_all)
+    print(list(cours_all))
+
+    form = DocumentForm()
+
+    return render(request, 'listes/admin_cours.html', {'user': admin, 'form': form, "data": list(cours_all)})
+
+def export_cours_csv(request,cours_id):
+    cours=Cours.objects.get(id=cours_id)
+    list_etudiant = Etudiant.objects.filter(cours=cours).values_list('numEtudiant','nom','prenom','email')
+    print(list_etudiant)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=liste_etudiants.csv'
+    df = pd.DataFrame(list_etudiant)
+    df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
+    return response
