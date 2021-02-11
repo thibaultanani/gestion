@@ -30,6 +30,7 @@
            <th>Filieres</th>
            <th>Niveau</th>
            <th>Type</th>
+             <th>Export</th>
            <th>Action</th>
          </tr>
        <tbody>
@@ -43,12 +44,21 @@
               </td>
                <td>{{ x.niveaux }}</td>
               <td>{{ x.types}}</td>
-<td>
-           <form action="{% url 'admin_modifier_cours' user.id x.id %}" method="post">{% csrf_token %}
-           <button >
-                          <i class="fas fa-edit"></i>
+
+            <td><form action="{% url 'export_cours_csv'  x.id %}" method="post">{% csrf_token %}
+           <button type="submit" >
+                          Export(Csv)
+           </button></form>
+                <form action="" method="post">{% csrf_token %}
+           <button type="submit" >
+                          Export(Excel)
                       </button>
                   </form>
+            </td>
+<td>
+
+                      <a href="{% url 'admin_modifier_cours' user.id x.id%}"><i class="fas fa-edit"></i></a>
+
 
                   <form action="{% url 'admin_supprimer_cours' user.id x.id %}" method="post">
                       {% csrf_token %}

@@ -104,7 +104,6 @@ class Etudiant(models.Model):
     nom = models.CharField(max_length=100, default=None)
     prenom = models.CharField(max_length=100, default=None)
     filieres = models.ManyToManyField(Filiere, default=None)
-    email = models.EmailField(max_length=100, default=None)
     niveaux = ListCharField(
         base_field=models.CharField(
             max_length=10,

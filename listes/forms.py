@@ -111,7 +111,7 @@ class AjouterCours(forms.Form):
             ]
 
     nb= [tuple([x, x]) for x in range(1, 4)]
-    nomCours =forms.CharField(label="nomCours", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    nomCours =forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     type= forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect(attrs={'class': "custom-radio-list"}))
     nb_filliere = forms.IntegerField(label="Fillière(s)", widget=forms.Select(choices=nb))
     nom_filliere1=forms.ModelChoiceField(queryset=Filiere.objects.all())
@@ -132,7 +132,7 @@ class AjouterCours(forms.Form):
         model = Cours
         fields = ('nom', 'niveaux', 'types','debut','fin')
 
-class ModifierCours(ModelForm):
+class ModifierCours(forms.Form):
 
     TYPES = [('CM', 'CM'),
                  ('TD', 'TD')]
@@ -144,17 +144,17 @@ class ModifierCours(ModelForm):
             ]
 
     nb= [tuple([x, x]) for x in range(1, 4)]
-    nomCours =forms.CharField(label="nomCours", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    nomCours =forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     type= forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect(attrs={'class': "custom-radio-list"}))
     #nb_filliere = forms.IntegerField(label="Fillière(s)", widget=forms.Select(choices=nb))
-    #nom_filliere1=forms.ModelChoiceField(queryset=Filiere.objects.all())
-    #nom_filliere2=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
-    #nom_filliere3=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
+    nom_filliere1=forms.ModelChoiceField(queryset=Filiere.objects.all())
+    nom_filliere2=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
+    nom_filliere3=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
     #nb_prof=forms.IntegerField(label="", widget=forms.Select(choices=nb))
 
-    #nom_prof1=forms.ModelChoiceField(queryset=Professeur.objects.all())
-    #nom_prof2=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
-    #nom_prof3=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
+    nom_prof1=forms.ModelChoiceField(queryset=Professeur.objects.all())
+    nom_prof2=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
+    nom_prof3=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
     Niveau=forms.ChoiceField(label="Niveau",choices=niveau)
     date_debut=forms.DateField(initial=datetime.date.today)
     date_fin=forms.DateField(initial=datetime.date.today)

@@ -171,15 +171,37 @@ def admin_creer_cours(request, user_id):
 def admin_modifier_cours(request,user_id, cours_id):
     user = get_object_or_404(User, id=user_id)
     cours = get_object_or_404(Cours, id=cours_id)
+    if len(cours.filieres.all())==2:
+        fil2=cours.filieres.all()[1]
+        fil3=""
+
+    elif len(cours.filieres.all())==3:
+        fil2=cours.filieres.all()[1]
+        fil3 = cours.filieres.all()[2]
+
+    else:
+        fil2="2"
+        fil3=""
+
+    if len(Professeur.objects.filter(cours=cours)) == 2:
+        prof2 = Professeur.objects.filter(cours=cours)[1]
+        prof3=""
+
+    elif len(Professeur.objects.filter(cours=cours)) == 3:
+        prof2 = Professeur.objects.filter(cours=cours)[1]
+        prof3 = Professeur.objects.filter(cours=cours)[2]
+    else:
+        prof2 = ""
+        prof3 = ""
     if request.method == "POST":
         form = ModifierCours(request.POST, initial={"nomCours": cours.nom,
                                                      "type": cours.types,
-                                                      #"nom_filliere1": cours.filieres.all()[0],
-                                                       #"nom_filliere2": cours.filieres.all()[1],
-                                                       #"nom_filliere3": cours.filieres.all()[2],
-                                                        #"nom_prof1": Professeur.objects.filter(cours=cours)[0],
-                                                         #"nom_prof2": Professeur.objects.filter(cours=cours)[1],
-                                                          #"nom_prof3": Professeur.objects.filter(cours=cours)[2],
+                                                      "nom_filliere1": cours.filieres.all()[0],
+                                                       "nom_filliere2": fil2,
+                                                       "nom_filliere3": fil3,
+                                                        "nom_prof1": Professeur.objects.filter(cours=cours)[0],
+                                                         "nom_prof2": prof2,
+                                                          "nom_prof3": prof3,
                                                           "Niveau": cours.niveaux,
                                                            "date_debut": cours.debut,
                                                              "date_fin":cours.fin
@@ -204,7 +226,33 @@ def admin_modifier_cours(request,user_id, cours_id):
             cours.niveaux=niveau
             cours.debut=debut
             cours.fin=fin
+            cours.filieres.clear()
+            cours.filieres.add(filliere1)
+            if filliere2:
+                cours.filieres.add(filliere2)
+            else:
+                print('filliere2 vide')
 
+            if filliere3:
+                cours.filieres.add(filliere3)
+            else:
+                print('filliere 3 vide')
+            cours.save()
+            print(fil2)
+            cours.professeur_set.clear()
+            cours.professeur_set.add(professeur1)
+            if professeur2:
+                cours.professeur_set.add(professeur2)
+
+
+            else:
+                print('prof2 vide')
+
+            if professeur3:
+                cours.professeur_set.add(professeur3)
+
+            else:
+                print('prof3 vide')
         else:
           messages.error(request, 'Erreur lors de la modification, réesayez plus tard')
         print("####")
@@ -215,22 +263,23 @@ def admin_modifier_cours(request,user_id, cours_id):
         print("####")
         return admin_cours(request, user.id)
 
+
     else:
         form = ModifierCours(initial={"nomCours": cours.nom,
                                                      "type": cours.types,
-                                                      #"nom_filliere1": cours.filieres.all()[0],
-                                                       #"nom_filliere2": cours.filieres.all()[1],
-                                                       #"nom_filliere3": cours.filieres.all()[2],
-                                                        #"nom_prof1": Professeur.objects.filter(cours=cours)[0],
-                                                         #"nom_prof2": Professeur.objects.filter(cours=cours)[1],
-                                                          #"nom_prof3": Professeur.objects.filter(cours=cours)[2],
+                                                      "nom_filliere1": cours.filieres.all()[0],
+                                                       "nom_filliere2": fil2,
+                                                       "nom_filliere3": fil3,
+                                                        "nom_prof1": Professeur.objects.filter(cours=cours)[0],
+                                                        "nom_prof2": prof2,
+                                                        "nom_prof3": prof3,
                                                           "Niveau": cours.niveaux,
                                                           "date_debut": cours.debut,
                                                           "date_fin":cours.fin
 
 
                                                    })
-    print("ça marche pas ")
+    print("ici")
 
     return render(request, 'listes/admin_modifier_cours.html', {'user': user,'cours':cours,'form': form})
 
@@ -403,10 +452,6 @@ def admin_etudiant(request, user_id):
     etudiant_all = Etudiant.objects.all()
     print(etudiant_all)
     print(list(etudiant_all))
-
-    print(Etudiant.objects.get(id=3).filieres.all())
-    print(";;;;;;")
-
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
@@ -682,3 +727,13 @@ def admin_supprimer_cours(request, user_id, cours_id):
     form = DocumentForm()
 
     return render(request, 'listes/admin_cours.html', {'user': admin, 'form': form, "data": list(cours_all)})
+
+def export_cours_csv(request,cours_id):
+    cours=Cours.objects.get(id=cours_id)
+    list_etudiant = Etudiant.objects.filter(cours=cours).values_list('numEtudiant','nom','prenom','email')
+    print(list_etudiant)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=liste_etudiants.csv'
+    df = pd.DataFrame(list_etudiant)
+    df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
+    return response
