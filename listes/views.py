@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render,redirect
-from django.urls import reverse
+from django.urls import reverse,reverse_lazy
 from .forms import *
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
@@ -25,13 +25,14 @@ def connexion(request):
                 username = User.objects.get(email=email.lower()).username
                 user_object = User.objects.get(email=email.lower())
 
-                user = authenticate(username=username, password=password)
+                user = authenticate(request,username=username, password=password)
                 if user is not None and user.is_active:
                     login(request, user)
                     if Admnistrateur.objects.filter(user_id=user_object.pk).exists():
                         return render(request, 'listes/accueil_admin.html', {'user_object': user_object})
                     if Professeur.objects.filter(user_id=user_object.pk).exists():
-                        return render(request, 'listes/accueil_professeur.html', {'user_object': user_object})
+                        print("testttt")
+                        return render(request, 'listes/home_prof.html', {'user_object': user_object})
             except:
                 render(request, 'listes/login.html', {'form': form})
     else:
@@ -50,22 +51,29 @@ def accueil_admin(request, user_object):
     print(user.first_name)
     return render(request, 'listes/accueil_admin.html', {'user': user})
 
+def home_professeur(request,user_id):
+    user=get_object_or_404(User,id=user_id)
+    return render(request, 'listes/home_prof.html', {'user': user,})
 
-@login_required(login_url="/connexion")
 def accueil_professeur(request, user_id):
+    print("YOO")
     user = get_object_or_404(User, id=user_id)
-    print(user.first_name)
-    return render(request, 'listes/accueil_professeur.html', {'user': user})
+    prof=get_object_or_404(Professeur,user_id=user_id)
+    cours_all = Cours.objects.filter(debut__lte=datetime.date.today(),fin__gte=datetime.date.today(),professeur__id=prof.id).values()
+    return render(request, 'listes/accueil_professeur.html', {'user': user,"data": list(cours_all)})
 
 
-def prof_liste_etudiant(request, user_id):
+def prof_liste_etudiant(request, user_id,cours_id):
     user = get_object_or_404(User, id=user_id)
-    return render(request, 'listes/prof_liste_etudiant.html', {'user': user})
+    cours= get_object_or_404(Cours,id=cours_id)
+    etudiant_all= Etudiant.objects.filter(cours__id=cours.id).values()
+    return render(request, 'listes/prof_liste_etudiant.html', {'user': user,'cours':cours,"data":list(etudiant_all)})
 
 
-def prof_cursus_etudiant(request, user_id):
+def prof_cursus_etudiant(request, user_id,etu_id):
     user = get_object_or_404(User, id=user_id)
-    return render(request, 'listes/prof_cursus_etudiant.html', {'user': user})
+    etu=get_object_or_404(Etudiant,id=etu_id)
+    return render(request, 'listes/prof_cursus_etudiant.html', {'user': user,"etu":etu})
 
 
 def admin_cours(request, user_id):

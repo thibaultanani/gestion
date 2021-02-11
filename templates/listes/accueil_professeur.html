@@ -1,20 +1,91 @@
 <!DOCTYPE html>
+{% extends 'listes/prof_base.html' %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Accueil Professeur</title>
+    <title>Liste des cours</title>
+      <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/fontawesome-free/css/all.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/node_modules/AdminLTE/dist/css/adminlte.min.css">
 </head>
-<body>
-Bonjour prof , {{ user.first_name }} {{ user.last_name }} {{ user.id }}
-    <h1>Accueil professeur</h1>
-    <h2>Bonjour professeur !</h2>
-    <h2>Liste de cours: </h2>
+<body class="hold-transition sidebar-mini">
+    <h1>Liste des cours </h1>
+
+{% block content %}
 
 
-<button><a href="{% url 'prof_liste_etudiant' user.id %}">Cours X</a></button>
+      <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Listes des cours</h1>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
 
-<button><a href="{% url 'modif_mdp' user.id %}">Modification mot de passe</a></button>
+        <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
 
-<button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
-</body>
-</html>
+                 <table id="example1" class="table table-bordered table-striped">
+       <thead>
+         <tr>
+           <th>Nom cours</th>
+           <th>Niveau</th>
+           <th>Type</th>
+         </tr>
+       </thead>
+        <tbody>
+          {% for x in data %}
+            <tr>
+               <td><a href="{% url 'prof_liste_etudiant' user.id x.id %}">{{ x.nom }}</a></td>
+              <td> {% for niv in x.niveaux %}
+                      {% if niv != 'nan' %}
+                        {{ niv }}<br>
+                      {% endif %}
+                  {% endfor %}</td>
+              <td>{{ x.types }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+
+                </table>
+
+              </div>
+              <!-- /.card-body -->
+            </div>
+          </div>
+              <!-- /.card-body -->
+
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+      <!-- /.container-fluid -->
+    </section>
+
+      </div>
+{% endblock %}
+
+     <section class="content">
+
+
+
+    </section>
+
