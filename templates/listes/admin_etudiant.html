@@ -1,32 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+{% extends 'listes/admin_base.html' %}
+{% load i18n %}
+{% load static %}
+<html lang="fr">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Gestion des etudiants (admin)</title>
-      <!-- Google Font: Source Sans Pro -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestion de listes| Accueil</title>
+
+  <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/fontawesome-free/css/all.min.css">
-  <!-- DataTables -->
-  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  <link rel="stylesheet" href="/static/node_modules/AdminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css'%}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/jqvmap/jqvmap.min.css' %}">
   <!-- Theme style -->
-  <link rel="stylesheet" href="/static/node_modules/AdminLTE/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="{% static 'node_modules/AdminLTE/dist/css/adminlte.min.css' %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/daterangepicker/daterangepicker.css' %}">
+  <!-- summernote -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/summernote/summernote-bs4.min.css' %}">
+
+    <style>
+    .btn {
+      background-color: DodgerBlue;
+      border: none;
+      color: white;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Darker background on mouse-over */
+    .btn:hover {
+      background-color: RoyalBlue;
+    }
+    </style>
 </head>
-<body class="hold-transition sidebar-mini">
-    <h1>Liste des étudiants </h1>
-     {{ user.first_name }}
-    {{ user.last_name }}
-    <button type="button">Importer liste</button><br><br>
-    <button type="button"><a href="{% url 'admin_creer_etudiant' user.id %}">Créer étudiant-e</a></button><br><br>
-    <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
-    <button><a href="{% url 'export_etudiant_xlsx' %}">Exporter (Excel)</a></button>
-    <button><a href="{% url 'export_etudiant_csv' %}">Exporter (CSV)</a></button>
+{% block content %}
+    <a href="{% url 'admin_creer_etudiant' user.id %}">Créer étudiant-e</a><
 
+      <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Listes des étudiants</h1>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
 
-
-     <section class="content">
+        <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                      <a class="btn btn-primary btn-sm" href="{% url 'export_etudiant_xlsx' %}"><i class="fa fa-upload"></i> Excel</a>
+                      <a class="btn btn-primary btn-sm" href="{% url 'export_etudiant_csv' %}"><i class="fa fa-upload"></i> CSV</a>
+                      <a class="btn btn-primary btn-sm" href="{% url 'admin_creer_etudiant' user.id %}"><i class="fa fa-plus"></i> Ajouter étudiant</a>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
 
                 <table id="example1" class="table table-bordered table-striped">
        <thead>
@@ -36,6 +82,7 @@
            <th>Prénom</th>
            <th>Email</th>
            <th>Niveau</th>
+           <th>Filiere</th>
            <th>Action</th>
          </tr>
        </thead>
@@ -54,15 +101,26 @@
                   {% endfor %}
               </td>
               <td>
-                  <a href="{%url 'admin_modifier_etudiant' user.id x.id%}"><i class="fas fa-edit"></i></a>
-                  <a href="{%url 'admin_switch_cours_etudiant' user.id x.id%}"><i class="fas fa-exchange-alt"></i></a>
-                  <form action="{% url 'admin_supprimer_etudiant' user.id x.id %}" method="post">
+                  {% for fil in x.filieres.all %}
+                        {{ fil.nom }}<br>
+                  {% endfor %}
+              </td>
+              <td>
+                  <div class="btn-group">
+                  <a href="{% url 'admin_modifier_etudiant' user.id x.id%}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>
+                  </div>
+                  <div class="btn-group">
+                  <a href="{% url 'admin_switch_cours_etudiant' user.id x.id%}" class="btn btn-primary btn-sm"><i class="fas fa-exchange-alt"></i></a>
+                  </div>
+                  <div class="btn-group">
+                  <form action="{% url 'admin_supprimer_etudiant' user.id x.id%}" method="post">
                       {% csrf_token %}
 
-                      <button onclick="return confirm('Confirmer la suppression de cet etudiant?');">
+                      <button onclick="return confirm('Confirmer la suppression de cet étudiant?');" class="btn btn-danger btn-sm">
                           <i class="fas fa-trash"></i>
                       </button>
                   </form>
+                  </div>
               </td>
 
             </tr>
@@ -70,62 +128,30 @@
           </tbody>
 
                 </table>
-
-    </section>
-
-           <form action="{% url 'admin_etudiant' user.id %}" method="post" enctype="multipart/form-data">
+                         <form action="{% url 'admin_etudiant' user.id %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <p>{{ form.non_field_errors }}</p>
-            <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
             <p>
                 {{ form.docfile.errors }}
                 {{ form.docfile }}
             </p>
-            <p><input type="submit" value="Upload" /></p>
+            <button type="submit" class="btn btn-success btn-sm">
+                  <i class="fas fa-download"></i>
+            </button>
+
         </form>
+              </div>
+              <!-- /.card-body -->
+            </div>
+          </div>
+              <!-- /.card-body -->
 
-     <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+      <!-- /.container-fluid -->
+    </section>
 
+      </div>
+{% endblock %}
 
-
-
-<!-- jQuery -->
-<script src="/static/node_modules/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="/static/node_modules/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables  & Plugins -->
-<script src="/static/node_modules/AdminLTE/plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/jszip/jszip.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/pdfmake/pdfmake.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/pdfmake/vfs_fonts.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="/static/node_modules/AdminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-<!-- AdminLTE App -->
-<script src="/static/node_modules/AdminLTE/dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="/static/node_modules/AdminLTE/dist/js/demo.js"></script>
-<!-- Page specific script -->
-<script>
-  $(function () {
-    $('#example1').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-    });
-  });
-</script>
-</body>
-</html>

@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render,redirect
-from django.urls import reverse
+from django.urls import reverse,reverse_lazy
 from .forms import *
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
@@ -25,13 +25,14 @@ def connexion(request):
                 username = User.objects.get(email=email.lower()).username
                 user_object = User.objects.get(email=email.lower())
 
-                user = authenticate(username=username, password=password)
+                user = authenticate(request,username=username, password=password)
                 if user is not None and user.is_active:
                     login(request, user)
                     if Admnistrateur.objects.filter(user_id=user_object.pk).exists():
                         return render(request, 'listes/accueil_admin.html', {'user_object': user_object})
                     if Professeur.objects.filter(user_id=user_object.pk).exists():
-                        return render(request, 'listes/accueil_professeur.html', {'user_object': user_object})
+                        print("testttt")
+                        return render(request, 'listes/home_prof.html', {'user_object': user_object})
             except:
                 render(request, 'listes/login.html', {'form': form})
     else:
@@ -45,27 +46,34 @@ def deconnexion(request):
 
 
 @login_required(login_url="/connexion")
-def accueil_admin(request, user_object):
-    user = get_object_or_404(User, id=user_object.id)
+def accueil_admin(request, user_id):
+    user = get_object_or_404(User, id=user_id)
     print(user.first_name)
-    return render(request, 'listes/accueil_admin.html', {'user': user})
+    return render(request, 'listes/accueil_admin.html', {'user_object': user})
 
+def home_professeur(request,user_id):
+    user=get_object_or_404(User,id=user_id)
+    return render(request, 'listes/home_prof.html', {'user': user,})
 
-@login_required(login_url="/connexion")
 def accueil_professeur(request, user_id):
+    print("YOO")
     user = get_object_or_404(User, id=user_id)
-    print(user.first_name)
-    return render(request, 'listes/accueil_professeur.html', {'user': user})
+    prof=get_object_or_404(Professeur,user_id=user_id)
+    cours_all = Cours.objects.filter(debut__lte=datetime.date.today(),fin__gte=datetime.date.today(),professeur__id=prof.id).values()
+    return render(request, 'listes/accueil_professeur.html', {'user': user,"data": list(cours_all)})
 
 
-def prof_liste_etudiant(request, user_id):
+def prof_liste_etudiant(request, user_id,cours_id):
     user = get_object_or_404(User, id=user_id)
-    return render(request, 'listes/prof_liste_etudiant.html', {'user': user})
+    cours= get_object_or_404(Cours,id=cours_id)
+    etudiant_all= Etudiant.objects.filter(cours__id=cours.id)
+    return render(request, 'listes/prof_liste_etudiant.html', {'user': user,'cours':cours,"data":list(etudiant_all)})
 
 
-def prof_cursus_etudiant(request, user_id):
+def prof_cursus_etudiant(request, user_id,etu_id):
     user = get_object_or_404(User, id=user_id)
-    return render(request, 'listes/prof_cursus_etudiant.html', {'user': user})
+    etu=get_object_or_404(Etudiant,id=etu_id)
+    return render(request, 'listes/prof_cursus_etudiant.html', {'user': user,"etu":etu})
 
 
 def admin_cours(request, user_id):
@@ -139,6 +147,7 @@ def admin_professeur(request, user_id):
                 professeur_all[i]['email'] = user_obj.email
                 listProfesseur.append(professeur_all[i])
             render(request, 'listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
+            return HttpResponseRedirect('listes/admin_professeur.html', {'user': user, 'form': form, "data": list(professeur_all)})
     else:
         print("echec3")
         form = DocumentForm()
@@ -159,7 +168,7 @@ def modif_mdp(request, user_id):
                     if check_password(old_mdp, user_mdp.password):
                         user_mdp.set_password(new_mdp)
                         user_mdp.save()
-                        return render(request, 'listes/accueil_professeur.html', {'user': user})
+                        return render(request, 'listes/login.html')
                     else:
                         print("echec-1")
                         messages.error(request, 'L\'ancien mot de passe ne correspond pas')
@@ -182,9 +191,11 @@ def modif_mdp(request, user_id):
 
 
 def admin_modifier_professeur(request, user_id, prof_id):
+    print('user_id', user_id)
+    print('prof_id', prof_id)
     user = get_object_or_404(User, id=prof_id)
     admin = get_object_or_404(User, id=user_id)
-    prof = Professeur.objects.get(user=user)
+    prof = Professeur.objects.get(user_id=prof_id)
     print("SALUT")
     if request.method == "POST":
         form = ModifierProfesseur(request.POST, initial={"nom": user.last_name,
@@ -227,7 +238,7 @@ def admin_modifier_professeur(request, user_id, prof_id):
                                            "email": user.email,
                                            "titre": prof.titre})
     print("HELLO2")
-    return render(request, 'listes/admin_modifier_professeur.html', {'user': user, 'admin': admin, 'form': form})
+    return render(request, 'listes/admin_modifier_professeur.html', {'user': admin, 'etu': user, 'form': form})
 
 
 def admin_creer_professeur(request, user_id):
@@ -240,7 +251,7 @@ def admin_creer_professeur(request, user_id):
             nom = request.POST.get('nom', False)
             email = request.POST.get('email', False)
             titre = request.POST.get('titre', False)
-            password=make_password('test1234')
+            password = make_password('test1234')
 
             utilisateur = User(first_name=prenom, last_name=nom, email=email,
                                username=email, password=password)
@@ -259,7 +270,18 @@ def admin_creer_professeur(request, user_id):
         else:
             print("echec")
             messages.error(request, 'Erreur lors de l\'ajout, réesayez plus tard')
-        return render(request, 'listes/admin_creer_professeur.html', {'user': user, 'form': form})
+        professeur_all = Professeur.objects.all().values()
+        listProfesseur = []
+        for i in range(len(professeur_all)):
+            user_obj = User.objects.get(id=professeur_all[i]["user_id"])
+            professeur_all[i]['username'] = user_obj.username
+            professeur_all[i]['first_name'] = user_obj.first_name
+            professeur_all[i]['last_name'] = user_obj.last_name
+            professeur_all[i]['email'] = user_obj.email
+            listProfesseur.append(professeur_all[i])
+        form = DocumentForm()
+        return render(request, 'listes/admin_professeur.html',
+                                    {'user': user, 'form': form, "data": list(professeur_all)})
     else:
         print("echec2")
         form = AjouterProfesseur()
@@ -268,8 +290,8 @@ def admin_creer_professeur(request, user_id):
 
 def admin_etudiant(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    etudiant_all = Etudiant.objects.all().values()
-    print(etudiant_all)
+    etudiant_all = Etudiant.objects.all()
+    #print(etudiant_all)
     print(list(etudiant_all))
 
     if request.method == 'POST':
@@ -283,36 +305,206 @@ def admin_etudiant(request, user_id):
                 read_etu_xlsx_file(newdoc.docfile)
             # Redirect to the document list after POST
             print("good")
-            etudiant_all = Etudiant.objects.all().values()
+            etudiant_all = Etudiant.objects.all()
+
             return render(request, 'listes/admin_etudiant.html',
                           {'user': user, 'form': form, "data": list(etudiant_all)})
     else:
-        print("echec3")
         form = DocumentForm()
     return render(request, 'listes/admin_etudiant.html', {'user': user, 'form': form, "data": list(etudiant_all)})
 
 
-def admin_creer_etudiant(request,user_id):
+def admin_creer_etudiant(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    return render(request, 'listes/admin_creer_etudiant.html',{'user':user})
+    if request.method == "POST":
+        form = AjouterEtudiant(request.POST)
+        if form.is_valid():
+            choix_niveau = ["L1","L2","L3","M1","M2"]
+            numEtu = request.POST.get('numEtudiant', False)
+            nom = request.POST.get('nom', False)
+            prenom = request.POST.get('prenom', False)
+            email = request.POST.get('email', False)
+            niveaux = [request.POST.get('niveaux', False)]
+            if niveaux[0] not in ["L1","M1","M2"]:
+                if request.POST.get('ajac',False):
+                    index = choix_niveau.index(niveaux[0])
+                    niveaux.append(choix_niveau[index-1])
+                    print(niveaux)
+            filliere = request.POST.get('filliere', False)
+            filliere2 = request.POST.get('filliere2', False)
+
+            etudiant = Etudiant(numEtudiant=numEtu, nom=nom, prenom=prenom, email=email, niveaux=niveaux)
+            etudiant.save()
+            if filliere2 is "":
+                etudiant.filieres.add(filliere)
+            else:
+                etudiant.filieres.add(filliere)
+                etudiant.filieres.add(filliere2)
+
+            etudiant_all = Etudiant.objects.all()
+
+            print('#####')
+            print(etudiant)
+            print('#####')
+            messages.success(request, 'Un nouvelle étudiant a été créé')
+            return render(request, 'listes/admin_etudiant.html', {'user':user, "data": list(etudiant_all)})
+        else:
+            print("echec")
+            etudiant_all = Etudiant.objects.all()
+            messages.error(request, 'Erreur lors de l\'ajout, réesayer plus tard')
+        return render(request, 'listes/admin_creer_etudiant.html', {'form': form, 'user':user, "data": list(etudiant_all)})
+    else:
+        print("echec2")
+        form = AjouterEtudiant()
+    return render(request, 'listes/admin_creer_etudiant.html', {'form': form,'user':user})
 
 
 def admin_modifier_etudiant(request,user_id,etu_id):
     user = get_object_or_404(User, id=user_id)
     etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_modifier_etudiant.html',{'user':user,'etu':etu})
+
+    fil = list(etu.filieres.all())
+    if request.method == "POST":
+        if len(fil)==2:
+            print(fil)
+            form = ModifierEtudiant(request.POST, initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                            "prenom": etu.prenom,
+                                                            "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                            "filliere": fil[0],
+                                                           "filliere2": fil[1]})
+        else:
+            form = ModifierEtudiant(request.POST, initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                            "prenom": etu.prenom,
+                                                            "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                            "filliere": fil[0]})
+        if form.is_valid():
+            choix_niveau = ["L1", "L2", "L3", "M1", "M2"]
+            print("id = "+etu_id)
+            numEtu = request.POST.get('numEtudiant', False)
+            nom = request.POST.get('nom', False)
+            prenom = request.POST.get('prenom', False)
+            email = request.POST.get('email', False)
+            niveaux = [request.POST.get('niveaux', False)]
+            if niveaux[0] not in ["L1","M1","M2"]:
+                if request.POST.get('ajac',False):
+                    index = choix_niveau.index(niveaux[0])
+                    niveaux.append(choix_niveau[index-1])
+                    print(niveaux)
+            filliere = request.POST.get('filliere', False)
+            filliere2 = request.POST.get('filliere2', False)
+
+            etudiant_all = Etudiant.objects.all()
+            try:
+                print(Etudiant.objects.get(id=etu_id))
+                user_etu = Etudiant.objects.get(id=etu_id)
+                user_etu.numEtudiant = numEtu
+                user_etu.nom = nom
+                user_etu.prenom = prenom
+                user_etu.email = email
+                user_etu.niveaux = niveaux
+                user_etu.save()
+
+                print("ici 1")
+                user_etu.filieres.clear()
+                print("ici 2")
+                if filliere2 is "":
+                    user_etu.filieres.add(filliere)
+                else:
+                    user_etu.filieres.add(filliere)
+                    user_etu.filieres.add(filliere2)
+
+                etudiant_all = Etudiant.objects.all()
+
+                return render(request, 'listes/admin_etudiant.html', {'user':user, "data": list(etudiant_all)})
+            except:
+                return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user':user, "data": list(etudiant_all)})
+        else:
+            print("echec")
+            messages.error(request, 'Erreur lors de la modification, réesayer plus tard')
+        return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user': user, 'etu': etu})
+    else:
+        print("echec2")
+        print(etu.numEtudiant)
+        print(etu.niveaux)
+        if len(fil) == 2:
+            print(fil)
+            form = ModifierEtudiant(initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                           "prenom": etu.prenom,
+                                                           "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                           "filliere": fil[0],
+                                                           "filliere2": fil[1]})
+        else:
+            form = ModifierEtudiant(initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                           "prenom": etu.prenom,
+                                                           "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                           "filliere": fil[0]})
+    return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user': user, 'etu': etu})
 
 
 def admin_cursus_etudiant(request,user_id,etu_id):
     user = get_object_or_404(User, id=user_id)
     etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_cursus_etudiant.html',{'user':user,'etu':etu})
+    cursusEtu = Cursus.objects.filter(etudiant_id=etu.id)
+    filiereEtu = []
+    for i in cursusEtu:
+        filiereEtu.append(get_object_or_404(Filiere, id=i.filiere_id).nom)
+    print(filiereEtu)
+    return render(request, 'listes/admin_cursus_etudiant.html',{'user':user,'etu':etu, "cursus": zip(cursusEtu, filiereEtu)})
 
 
 def admin_switch_cours_etudiant(request,user_id,etu_id):
-    user = get_object_or_404(User, id=user_id)
+    admin = get_object_or_404(User, id=user_id)
     etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_switch_cours_etudiant.html',{'user':user,'etu':etu})
+    cours_all = Cours.objects.all().filter(niveaux__in=etu.niveaux, filieres__in=etu.filieres.all())
+    print(etu)
+    print(etu.niveaux)
+    print(etu.nom)
+    print(cours_all)
+    print(etu.cours.all())
+    cours_etu = []
+    for cours in cours_all:
+        if cours in etu.cours.all():
+            cours_etu.append(1)
+        else:
+            cours_etu.append(0)
+    print(cours_etu)
+    if request.method == "POST":
+        form = SwitchForm(request.POST)
+        print(request.POST.getlist('choices'))
+        if request.POST.getlist('choices'):
+            for cours in cours_all:
+                print(cours)
+                if str(cours.id) in request.POST.getlist('choices'):
+                    etu.cours.add(get_object_or_404(Cours, id=cours.id))
+                    print("ajout: ", cours.id)
+                else:
+                    etu.cours.remove(get_object_or_404(Cours, id=cours.id))
+                    print("enlever: ", cours.id)
+                print("OK1")
+        else:
+            etu.cours.clear()
+            print("etu cours", etu.cours)
+            print("OK2")
+        cours_etu = []
+        for cours in cours_all:
+            if cours in etu.cours.all():
+                cours_etu.append(1)
+            else:
+                cours_etu.append(0)
+        return render(request, 'listes/admin_switch_cours_etudiant.html', {'user': admin, 'etu': etu, 'form': form,
+                                                                           "data": zip(list(cours_all), cours_etu)})
+    else:
+        form = SwitchForm()
+    return render(request, 'listes/admin_switch_cours_etudiant.html', {'user': admin, 'etu': etu, 'form': form,
+                                                                       "data": zip(list(cours_all), cours_etu)})
 
 
 def read_csv_file(file):
@@ -368,10 +560,10 @@ def read_etu_csv_file(file):
     print("JE SUIS UN CSV")
     # TODO : ajouter un mot de passe pour les utilisateurs crées
     for index, row in mon_fichier.iterrows():
-        if row['Niveau 1'] in check_list:
+        if row['Niveau 1'] in check_list and Filiere.objects.filter(nom=str(row['Filiere 1']).upper()).exists():
             niveaux = []
             niveaux.append(row['Niveau 1'])
-            if row['Niveau 2']:
+            if row['Niveau 2'] in check_list:
                 niveaux.append(row['Niveau 2'])
             etudiant, cree1 = Etudiant.objects.get_or_create(
                 numEtudiant=row["Numero Etudiant"],
@@ -381,6 +573,9 @@ def read_etu_csv_file(file):
                           'niveaux': niveaux,
                           }
             )
+            etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 1']).upper()))
+            if Filiere.objects.filter(nom=str(row['Filiere 2']).upper()).exists():
+                etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 2']).upper()))
             print(cree1)
 
 
@@ -391,10 +586,10 @@ def read_etu_xlsx_file(file):
     print("JE SUIS UN XLSX")
     # TODO : ajouter un mot de passe pour les utilisateurs crées
     for index, row in mon_fichier.iterrows():
-        if row['Niveau 1'] in check_list:
+        if row['Niveau 1'] in check_list and Filiere.objects.filter(nom=str(row['Filiere 1']).upper()).exists():
             niveaux = []
             niveaux.append(row['Niveau 1'])
-            if row['Niveau 2']:
+            if row['Niveau 2'] in check_list:
                 niveaux.append(row['Niveau 2'])
             etudiant, cree1 = Etudiant.objects.get_or_create(
                 numEtudiant=row["Numero Etudiant"],
@@ -404,6 +599,9 @@ def read_etu_xlsx_file(file):
                           'niveaux': niveaux,
                           }
             )
+            etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 1']).upper()))
+            if Filiere.objects.filter(nom=str(row['Filiere 2']).upper()).exists():
+                etudiant.filieres.add(get_object_or_404(Filiere, nom=str(row['Filiere 2']).upper()))
             print(cree1)
 
 
@@ -454,6 +652,13 @@ def export_etudiant_xlsx(request):
         df = pd.DataFrame(list(etudiant_all))
         writer = pd.ExcelWriter(b, engine='openpyxl')
         df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+        filiere_list = []
+        for etu in Etudiant.objects.all():
+            filiere_list.append(list(etu.filieres.all()))
+        print(filiere_list)
+        df2 = pd.DataFrame(filiere_list)
+        df['Filiere 1'] = df2[0]
+        df['Filiere 2'] = df2[1]
         df = df.replace(np.nan, '', regex=True)
         df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
         print(df)
@@ -473,6 +678,13 @@ def export_etudiant_csv(request):
     response['Content-Disposition'] = 'attachment; filename=liste_etudiant.csv'
     df = pd.DataFrame(list(etudiant_all))
     df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+    filiere_list = []
+    for etu in Etudiant.objects.all():
+        filiere_list.append(list(etu.filieres.all()))
+    print(filiere_list)
+    df2 = pd.DataFrame(filiere_list)
+    df['Filiere 1'] = df2[0]
+    df['Filiere 2'] = df2[1]
     df = df.replace(np.nan, '', regex=True)
     df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
     print(df)
@@ -513,4 +725,5 @@ def admin_supprimer_etudiant(request, user_id, etu_id):
 
     form = DocumentForm()
 
-    return render(request, 'listes/admin_etudiant.html', {'user': admin, 'form': form, "data": list(etudiant_all)})
+    return admin_etudiant(request, user_id)
+
