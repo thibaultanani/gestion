@@ -319,14 +319,28 @@ def admin_creer_etudiant(request, user_id):
     if request.method == "POST":
         form = AjouterEtudiant(request.POST)
         if form.is_valid():
+            choix_niveau = ["L1","L2","L3","M1","M2"]
             numEtu = request.POST.get('numEtudiant', False)
             nom = request.POST.get('nom', False)
             prenom = request.POST.get('prenom', False)
             email = request.POST.get('email', False)
-            niveaux = [request.POST.get('niveaux', False), request.POST.get('niveaux2', False)]
+            niveaux = [request.POST.get('niveaux', False)]
+            if niveaux[0] not in ["L1","M1","M2"]:
+                if request.POST.get('ajac',False):
+                    index = choix_niveau.index(niveaux[0])
+                    niveaux.append(choix_niveau[index-1])
+                    print(niveaux)
+            filliere = request.POST.get('filliere', False)
+            filliere2 = request.POST.get('filliere2', False)
 
             etudiant = Etudiant(numEtudiant=numEtu, nom=nom, prenom=prenom, email=email, niveaux=niveaux)
             etudiant.save()
+            if filliere2 is "":
+                etudiant.filieres.add(filliere)
+            else:
+                etudiant.filieres.add(filliere)
+                etudiant.filieres.add(filliere2)
+
             etudiant_all = Etudiant.objects.all()
 
             print('#####')
@@ -348,7 +362,91 @@ def admin_creer_etudiant(request, user_id):
 def admin_modifier_etudiant(request,user_id,etu_id):
     user = get_object_or_404(User, id=user_id)
     etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_modifier_etudiant.html',{'user':user,'etu':etu})
+
+    fil = list(etu.filieres.all())
+    if request.method == "POST":
+        if len(fil)==2:
+            print(fil)
+            form = ModifierEtudiant(request.POST, initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                            "prenom": etu.prenom,
+                                                            "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                            "filliere": fil[0],
+                                                           "filliere2": fil[1]})
+        else:
+            form = ModifierEtudiant(request.POST, initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                            "prenom": etu.prenom,
+                                                            "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                            "filliere": fil[0]})
+        if form.is_valid():
+            choix_niveau = ["L1", "L2", "L3", "M1", "M2"]
+            print("id = "+etu_id)
+            numEtu = request.POST.get('numEtudiant', False)
+            nom = request.POST.get('nom', False)
+            prenom = request.POST.get('prenom', False)
+            email = request.POST.get('email', False)
+            niveaux = [request.POST.get('niveaux', False)]
+            if niveaux[0] not in ["L1","M1","M2"]:
+                if request.POST.get('ajac',False):
+                    index = choix_niveau.index(niveaux[0])
+                    niveaux.append(choix_niveau[index-1])
+                    print(niveaux)
+            filliere = request.POST.get('filliere', False)
+            filliere2 = request.POST.get('filliere2', False)
+
+            etudiant_all = Etudiant.objects.all()
+            try:
+                print(Etudiant.objects.get(id=etu_id))
+                user_etu = Etudiant.objects.get(id=etu_id)
+                user_etu.numEtudiant = numEtu
+                user_etu.nom = nom
+                user_etu.prenom = prenom
+                user_etu.email = email
+                user_etu.niveaux = niveaux
+                user_etu.save()
+
+                print("ici 1")
+                user_etu.filieres.clear()
+                print("ici 2")
+                if filliere2 is "":
+                    user_etu.filieres.add(filliere)
+                else:
+                    user_etu.filieres.add(filliere)
+                    user_etu.filieres.add(filliere2)
+
+                etudiant_all = Etudiant.objects.all()
+
+                return render(request, 'listes/admin_etudiant.html', {'user':user, "data": list(etudiant_all)})
+            except:
+                return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user':user, "data": list(etudiant_all)})
+        else:
+            print("echec")
+            messages.error(request, 'Erreur lors de la modification, réesayer plus tard')
+        return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user': user, 'etu': etu})
+    else:
+        print("echec2")
+        print(etu.numEtudiant)
+        print(etu.niveaux)
+        if len(fil) == 2:
+            print(fil)
+            form = ModifierEtudiant(initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                           "prenom": etu.prenom,
+                                                           "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                           "filliere": fil[0],
+                                                           "filliere2": fil[1]})
+        else:
+            form = ModifierEtudiant(initial={"numEtudiant": etu.numEtudiant,
+                                                           "nom": etu.nom,
+                                                           "prenom": etu.prenom,
+                                                           "email": etu.email,
+                                                           "niveaux": etu.niveaux[0],
+                                                           "filliere": fil[0]})
+    return render(request, 'listes/admin_modifier_etudiant.html', {'form': form, 'user': user, 'etu': etu})
 
 
 def admin_cursus_etudiant(request,user_id,etu_id):
