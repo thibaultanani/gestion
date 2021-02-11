@@ -66,7 +66,7 @@ def accueil_professeur(request, user_id):
 def prof_liste_etudiant(request, user_id,cours_id):
     user = get_object_or_404(User, id=user_id)
     cours= get_object_or_404(Cours,id=cours_id)
-    etudiant_all= Etudiant.objects.filter(cours__id=cours.id).values()
+    etudiant_all= Etudiant.objects.filter(cours__id=cours.id)
     return render(request, 'listes/prof_liste_etudiant.html', {'user': user,'cours':cours,"data":list(etudiant_all)})
 
 
