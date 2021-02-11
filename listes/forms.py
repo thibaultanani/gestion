@@ -25,13 +25,38 @@ class ConnexionForm(ModelForm):
 
 
 class AjouterEtudiant(ModelForm):
-    numEtudiant = forms.CharField(label="numéro Etudiant", max_length=100,
+    numEtudiant = forms.CharField(label="Numero Etudiant", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    nom = forms.CharField(label="nom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    prenom = forms.CharField(label="prenom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.CharField(label="email", max_length=150,
+                            widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email'}))
+
+    niveau_choix = [
+        ('L1', 'L1'),
+        ('L2', 'L2'),
+        ('L3', 'L3'),
+        ('M1', 'M1'),
+        ('M2', 'M2'),
+    ]
+
+    niveaux = forms.CharField(label="niveau", widget=forms.Select(choices=niveau_choix))
+    ajac = forms.BooleanField(required=False)
+
+    filliere = forms.ModelChoiceField(label="filliere",queryset=Filiere.objects.all())
+    filliere2 = forms.ModelChoiceField(label="filliere double licence", queryset=Filiere.objects.all(), required=False)
+
+    class Meta:
+        model = Etudiant
+        fields = ('numEtudiant', 'nom', 'prenom', 'email', 'niveaux', 'filliere')
+
+
+class ModifierEtudiant(ModelForm):
+    numEtudiant = forms.CharField(label="Numero Etudiant", max_length=100,
                                   widget=forms.TextInput(attrs={'class': 'form-control'}))
     nom = forms.CharField(label="nom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     prenom = forms.CharField(label="prenom", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.CharField(label="email", max_length=150,
-                            widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email',
-                                                          'placeholder': 'Email'}))
+                            widget=forms.TextInput(attrs={'class': 'form-control', 'name': 'email'}))
 
     niveau_choix = [
         ('L1', 'L1'),
@@ -51,27 +76,14 @@ class AjouterEtudiant(ModelForm):
     ]
 
     niveaux = forms.CharField(label="niveau", widget=forms.Select(choices=niveau_choix))
-    niveaux2 = forms.CharField(label="second niveau", widget=forms.Select(choices=niveau_choix2))
+    ajac = forms.BooleanField(required=False)
 
-    filliere_choix = [
-        ('Maths', 'Maths'),
-        ('Eco', 'Eco'),
-        ('Gestion', 'Gestion'),
-    ]
-
-    filliere_choix2 = [
-        ('Nan', ' '),
-        ('Maths', 'Maths'),
-        ('Eco', 'Eco'),
-        ('Gestion', 'Gestion'),
-    ]
-
-    filliere = forms.CharField(label="fillière", widget=forms.Select(choices=filliere_choix))
-    filliere2 = forms.CharField(label="seconde fillière", widget=forms.Select(choices=filliere_choix2))
+    filliere = forms.ModelChoiceField(label="filliere", queryset=Filiere.objects.all())
+    filliere2 = forms.ModelChoiceField(label="filliere double licence", queryset=Filiere.objects.all(), required=False)
 
     class Meta:
         model = Etudiant
-        fields = ('numEtudiant', 'nom', 'prenom', 'email', 'niveaux', 'filliere')
+        fields = ('nom', 'prenom', 'email', 'niveaux', 'filliere')
 
 
 class AjouterProfesseur(ModelForm):
