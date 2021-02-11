@@ -165,47 +165,64 @@ class ModifierMdp(ModelForm):
 
 class AjouterCours(forms.Form):
 
-    TYPES = [('type1', 'CM'),
-                 ('type2', 'TD')]
-    niveaux=[ ('L1','L1'),
+    TYPES = [('CM', 'CM'),
+                 ('TD', 'TD')]
+    niveau=[ ('L1','L1'),
              ('L2','L2'),
              ('L3','L3'),
              ('M1','M1'),
              ('M2','M2'),
             ]
 
-    #nb_f = [tuple([x, x]) for x in range(1, 4)]
     nb= [tuple([x, x]) for x in range(1, 4)]
-    choix = (('1', 'Choix 1'),('2', 'Choix 2'))
-    model = Cours
-    nomCours = forms.CharField(label=_('Nom Cours'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    nomCours =forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     type= forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect(attrs={'class': "custom-radio-list"}))
     nb_filliere = forms.IntegerField(label="Fillière(s)", widget=forms.Select(choices=nb))
     nom_filliere1=forms.ModelChoiceField(queryset=Filiere.objects.all())
-    nom_filliere2=forms.ModelChoiceField(label="",queryset=Filiere.objects.all())
-    nom_filliere3=forms.ModelChoiceField(label="",queryset=Filiere.objects.all())
+    nom_filliere2=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
+    nom_filliere3=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
     nb_prof=forms.IntegerField(label="", widget=forms.Select(choices=nb))
-    nom_prof1=UserModelChoiceField(label="Professeur(s)",queryset=User.objects.all())
-    nom_prof2=UserModelChoiceField(label="",queryset=User.objects.all(), required=False)
-    nom_prof3=UserModelChoiceField(label="",queryset=User.objects.all(), required=False)
-    Niveau=forms.ChoiceField(label="Niveau",choices=niveaux)
+    nom_prof1=forms.ModelChoiceField(queryset=Professeur.objects.all())
+    nom_prof2=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
+    nom_prof3=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
+    Niveau=forms.ChoiceField(label="Niveau",choices=niveau)
     date_debut=forms.DateField(initial=datetime.date.today)
     date_fin=forms.DateField(initial=datetime.date.today)
 
     class Meta:
         model = Cours
-        fields = ('nom', 'niveaux', 'types')
+        fields = ('nom', 'niveaux', 'types','debut','fin')
 
-# class CreerCoursForm(forms.Form):
-#     nom = forms.CharField(label=_('Nom'), max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
-#     description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False)
-#     objectif = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False)
-#     code = forms.CharField(label=_('Code'), max_length=10, required=False,
-#                            widget=forms.TextInput(attrs={'class': 'form-control'}))
-#     Type = forms.ChoiceField(label=_('Type'), max_length=100, required=True, choices=Type)
-#
-#     def save(self, user):
-#
+class ModifierCours(forms.Form):
+
+    TYPES = [('CM', 'CM'),
+                 ('TD', 'TD')]
+    niveau=[ ('L1','L1'),
+             ('L2','L2'),
+             ('L3','L3'),
+             ('M1','M1'),
+             ('M2','M2'),
+            ]
+
+    nb= [tuple([x, x]) for x in range(1, 4)]
+    nomCours =forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    type= forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect(attrs={'class': "custom-radio-list"}))
+    #nb_filliere = forms.IntegerField(label="Fillière(s)", widget=forms.Select(choices=nb))
+    nom_filliere1=forms.ModelChoiceField(queryset=Filiere.objects.all())
+    nom_filliere2=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
+    nom_filliere3=forms.ModelChoiceField(label="",queryset=Filiere.objects.all(),required=False)
+    #nb_prof=forms.IntegerField(label="", widget=forms.Select(choices=nb))
+
+    nom_prof1=forms.ModelChoiceField(queryset=Professeur.objects.all())
+    nom_prof2=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
+    nom_prof3=forms.ModelChoiceField(queryset=Professeur.objects.all(),required=False)
+    Niveau=forms.ChoiceField(label="Niveau",choices=niveau)
+    date_debut=forms.DateField(initial=datetime.date.today)
+    date_fin=forms.DateField(initial=datetime.date.today)
+
+    class Meta:
+        model = Cours
+        fields = ('nom', 'niveaux', 'types','debut','fin')
 
 
 class SwitchForm(forms.Form):
