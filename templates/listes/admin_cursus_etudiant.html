@@ -49,12 +49,18 @@
          </tr>
        </thead>
         <tbody>
-          {% for x in data %}
+          {% for x, y in cursus %}
             <tr>
               <td>{{ x.debut }}</td>
               <td>{{ x.fin }}</td>
-              <td>{{ x.id_filiere }}</td>
-              <td>{{ x.niveaux }}</td>
+              <td>{{ y }}</td>
+              <td>
+                  {% for niv in x.niveaux %}
+                      {% if niv != 'nan' %}
+                        {{ niv }}<br>
+                      {% endif %}
+                  {% endfor %}
+              </td>
               <td>{{ x.etablissement }}</td>
             </tr>
           {% endfor %}

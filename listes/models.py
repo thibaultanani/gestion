@@ -127,7 +127,7 @@ class Document(models.Model):
 
 
 class Cursus(models.Model):
-    etudiants = models.ManyToManyField(Cours)
+    etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE, default=None)
     debut = models.DateField(default=None)
     fin = models.DateField(default=None)
     filiere = models.ForeignKey(Filiere, on_delete=models.CASCADE, default=None)
