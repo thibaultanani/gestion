@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^export_etudiant_xlsx/', views.export_etudiant_xlsx,  name='export_etudiant_xlsx'),
     url(r'^export_etudiant_csv/', views.export_etudiant_csv,  name='export_etudiant_csv'),
     url(r'^export_cours_csv/(?P<cours_id>[0-9]+)/', views.export_cours_csv, name='export_cours_csv'),
+    url(r'^export_cours_xlsx/(?P<cours_id>[0-9]+)/', views.export_cours_xlsx, name='export_cours_xlsx'),
     url(r'^admin_supprimer_professeur/(?P<user_id>[0-9]+)/(?P<prof_id>[0-9]+)/', views.admin_supprimer_professeur,name='admin_supprimer_professeur'),
     url(r'^admin_supprimer_etudiant/(?P<user_id>[0-9]+)/(?P<etu_id>[0-9]+)/', views.admin_supprimer_etudiant,name='admin_supprimer_etudiant'),
     url(r'^admin_supprimer_cours/(?P<user_id>[0-9]+)/(?P<cours_id>[0-9]+)/', views.admin_supprimer_cours,name='admin_supprimer_cours'),

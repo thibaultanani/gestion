@@ -932,7 +932,8 @@ def admin_supprimer_cours(request, user_id, cours_id):
 
     return render(request, 'listes/admin_cours.html', {'user': admin, 'form': form, "data": list(cours_all)})
 
-def export_cours_csv(request,cours_id):
+
+def export_cours_csv(request, cours_id):
     cours=Cours.objects.get(id=cours_id)
     list_etudiant = Etudiant.objects.filter(cours=cours).values_list('numEtudiant','nom','prenom','email')
     print(list_etudiant)
@@ -941,3 +942,17 @@ def export_cours_csv(request,cours_id):
     df = pd.DataFrame(list_etudiant)
     df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
     return response
+
+
+def export_cours_xlsx(request, cours_id):
+    cours=Cours.objects.get(id=cours_id)
+    list_etudiant = Etudiant.objects.filter(cours=cours).values_list('numEtudiant','nom','prenom','email')
+    print(list_etudiant)
+    with BytesIO() as b:
+        df = pd.DataFrame(list_etudiant)
+        writer = pd.ExcelWriter(b, engine='openpyxl')
+        df.to_excel(writer, index=False)
+        writer.save()
+        response = HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=liste_etudiant.xlsx'
+        return response
