@@ -291,7 +291,7 @@ def admin_creer_professeur(request, user_id):
 def admin_etudiant(request, user_id):
     user = get_object_or_404(User, id=user_id)
     etudiant_all = Etudiant.objects.all()
-    print(etudiant_all)
+    #print(etudiant_all)
     print(list(etudiant_all))
 
     if request.method == 'POST':
@@ -354,7 +354,12 @@ def admin_modifier_etudiant(request,user_id,etu_id):
 def admin_cursus_etudiant(request,user_id,etu_id):
     user = get_object_or_404(User, id=user_id)
     etu = get_object_or_404(Etudiant, id=etu_id)
-    return render(request, 'listes/admin_cursus_etudiant.html',{'user':user,'etu':etu})
+    cursusEtu = Cursus.objects.filter(etudiant_id=etu.id)
+    filiereEtu = []
+    for i in cursusEtu:
+        filiereEtu.append(get_object_or_404(Filiere, id=i.filiere_id).nom)
+    print(filiereEtu)
+    return render(request, 'listes/admin_cursus_etudiant.html',{'user':user,'etu':etu, "cursus": zip(cursusEtu, filiereEtu)})
 
 
 def admin_switch_cours_etudiant(request,user_id,etu_id):
