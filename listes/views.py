@@ -651,16 +651,23 @@ def export_etudiant_xlsx(request):
     with BytesIO() as b:
         df = pd.DataFrame(list(etudiant_all))
         writer = pd.ExcelWriter(b, engine='openpyxl')
-        df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+        try:
+            df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+        except:
+            df[['Niveau 1']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
         filiere_list = []
         for etu in Etudiant.objects.all():
             filiere_list.append(list(etu.filieres.all()))
         print(filiere_list)
         df2 = pd.DataFrame(filiere_list)
         df['Filiere 1'] = df2[0]
-        df['Filiere 2'] = df2[1]
+        try:
+            df['Filiere 2'] = df2[1]
+        except:
+            pass
         df = df.replace(np.nan, '', regex=True)
-        df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
+        if 'Niveau 2' in df.index:
+            df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
         print(df)
         df.drop('niveaux', inplace=True, axis=1)
         df.to_excel(writer, index=False)
@@ -677,16 +684,23 @@ def export_etudiant_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=liste_etudiant.csv'
     df = pd.DataFrame(list(etudiant_all))
-    df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+    try:
+        df[['Niveau 1', 'Niveau 2']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
+    except:
+        df[['Niveau 1']] = pd.DataFrame(df.niveaux.tolist(), index=df.index)
     filiere_list = []
     for etu in Etudiant.objects.all():
         filiere_list.append(list(etu.filieres.all()))
     print(filiere_list)
     df2 = pd.DataFrame(filiere_list)
     df['Filiere 1'] = df2[0]
-    df['Filiere 2'] = df2[1]
+    try:
+        df['Filiere 2'] = df2[1]
+    except:
+        pass
     df = df.replace(np.nan, '', regex=True)
-    df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
+    if 'Niveau 2' in df.index:
+        df['Niveau 2'] = df['Niveau 2'].replace('nan', '')
     print(df)
     df.drop('niveaux', inplace=True, axis=1)
     df.to_csv(path_or_buf=response, encoding="windows-1252", index=False, sep=';')
