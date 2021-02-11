@@ -170,10 +170,8 @@ def admin_creer_cours(request, user_id):
 
 def admin_modifier_cours(request,user_id, cours_id):
     user = get_object_or_404(User, id=user_id)
-    #cours = Cours.objects.get(id=cours_id)
     cours = get_object_or_404(Cours, id=cours_id)
     if request.method == "POST":
-       # form = ModifierCours(request.POST)
         form = ModifierCours(request.POST, initial={"nomCours": cours.nom,
                                                      "type": cours.types,
                                                       #"nom_filliere1": cours.filieres.all()[0],
@@ -182,7 +180,7 @@ def admin_modifier_cours(request,user_id, cours_id):
                                                         #"nom_prof1": Professeur.objects.filter(cours=cours)[0],
                                                          #"nom_prof2": Professeur.objects.filter(cours=cours)[1],
                                                           #"nom_prof3": Professeur.objects.filter(cours=cours)[2],
-                                                          "niveaux": cours.niveaux,
+                                                          "Niveau": cours.niveaux,
                                                            "date_debut": cours.debut,
                                                              "date_fin":cours.fin
 
@@ -218,10 +216,22 @@ def admin_modifier_cours(request,user_id, cours_id):
         return admin_cours(request, user.id)
 
     else:
-        form = ModifierCours()
+        form = ModifierCours(initial={"nomCours": cours.nom,
+                                                     "type": cours.types,
+                                                      #"nom_filliere1": cours.filieres.all()[0],
+                                                       #"nom_filliere2": cours.filieres.all()[1],
+                                                       #"nom_filliere3": cours.filieres.all()[2],
+                                                        #"nom_prof1": Professeur.objects.filter(cours=cours)[0],
+                                                         #"nom_prof2": Professeur.objects.filter(cours=cours)[1],
+                                                          #"nom_prof3": Professeur.objects.filter(cours=cours)[2],
+                                                          "Niveau": cours.niveaux,
+                                                          "date_debut": cours.debut,
+                                                          "date_fin":cours.fin
+
+
+                                                   })
     print("ça marche pas ")
 
-    #return render(request, 'listes/admin_cours.html')
     return render(request, 'listes/admin_modifier_cours.html', {'user': user,'cours':cours,'form': form})
 
 
