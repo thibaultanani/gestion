@@ -88,8 +88,8 @@
           {% for x in data %}
             <tr>
               <td>{{ x.numEtudiant }}</td>
-              <td><a href="{% url 'prof_cursus_etudiant' user.id x.id %}">{{ x.nom }}</a></td>
-              <td><a href="{% url 'prof_cursus_etudiant' user.id x.id%}">{{ x.prenom }}</a></td>
+              <td><a href="{% url 'prof_cursus_etudiant' user.id cours.id x.id %}">{{ x.nom }}</a></td>
+              <td><a href="{% url 'prof_cursus_etudiant' user.id cours.id x.id%}">{{ x.prenom }}</a></td>
               <td>{{ x.email }}</td>
               <td>
                   {% for niv in x.niveaux %}

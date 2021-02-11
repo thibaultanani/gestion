@@ -1,12 +1,147 @@
 <!DOCTYPE html>
-<html lang="en">
+{% extends 'listes/admin_base.html' %}
+{% load i18n %}
+{% load static %}
+<html lang="fr">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Cursus étudiants</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestion de listes| Accueil</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css'%}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/jqvmap/jqvmap.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'node_modules/AdminLTE/dist/css/adminlte.min.css' %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/daterangepicker/daterangepicker.css' %}">
+  <!-- summernote -->
+  <link rel="stylesheet" href="{% static '/node_modules/AdminLTE/plugins/summernote/summernote-bs4.min.css' %}">
+
+
 </head>
-<body>
-    <h1>Cursus pédagogique étudiant X</h1>
-    <button><a href="{% url 'modif_mdp' user.id %}">Modif mot de passe</a></button>
-    <button><a href="{% url 'deconnexion' %}">Déconexion</a></button>
+{% block content %}
+<body class="hold-transition sidebar-mini">
+ <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Cursus pédagogique de {{ etu.prenom }} {{ etu.nom }}</h1>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+
+
+
+ <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                  <a class="btn btn-primary btn-sm" href="{% url 'prof_liste_etudiant' user.id cours.id%}"><i class="fa fa-backward"></i> Retour</a>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+
+               <table id="exemple5" class="table table-bordered table-striped">
+    <tbody>
+        <tr>
+            <th>{{ etu.numEtudiant }}</th>
+            <th>{{ etu.nom }}</th>
+            <th>{{ etu.prenom }}</th>
+            <th>{{ etu.email }}</th>
+        </tr>
+    </tbody>
+    </table><br>
+              </div>
+              <!-- /.card-body -->
+            </div>
+          </div>
+              <!-- /.card-body -->
+
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+      <!-- /.container-fluid -->
+ </section>
+
+
+
+
+
+ <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+
+              <!-- /.card-header -->
+              <div class="card-body">
+
+                <table id="example1" class="table table-bordered table-striped">
+       <thead>
+         <tr>
+           <th>Début</th>
+           <th>Fin</th>
+           <th>Filière</th>
+           <th>Niveaux</th>
+           <th>Etablissement</th>
+         </tr>
+       </thead>
+        <tbody>
+          {% for x, y in cursus %}
+            <tr>
+              <td>{{ x.debut }}</td>
+              <td>{{ x.fin }}</td>
+              <td>{{ y }}</td>
+              <td>
+                  {% for niv in x.niveaux %}
+                      {% if niv != 'nan' %}
+                        {{ niv }}<br>
+                      {% endif %}
+                  {% endfor %}
+              </td>
+              <td>{{ x.etablissement }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+          </div>
+              <!-- /.card-body -->
+
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+      <!-- /.container-fluid -->
+    </section>
+
+
+
+
+
 </body>
 </html>
+{% endblock %}

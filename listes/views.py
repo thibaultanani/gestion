@@ -70,10 +70,16 @@ def prof_liste_etudiant(request, user_id,cours_id):
     return render(request, 'listes/prof_liste_etudiant.html', {'user': user,'cours':cours,"data":list(etudiant_all)})
 
 
-def prof_cursus_etudiant(request, user_id,etu_id):
+def prof_cursus_etudiant(request, user_id,cours_id,etu_id):
     user = get_object_or_404(User, id=user_id)
-    etu=get_object_or_404(Etudiant,id=etu_id)
-    return render(request, 'listes/prof_cursus_etudiant.html', {'user': user,"etu":etu})
+    etu = get_object_or_404(Etudiant, id=etu_id)
+    cours= get_object_or_404(Cours,id=cours_id)
+    cursusEtu = Cursus.objects.filter(etudiant_id=etu.id)
+    filiereEtu = []
+    for i in cursusEtu:
+        filiereEtu.append(get_object_or_404(Filiere, id=i.filiere_id).nom)
+    print(filiereEtu)
+    return render(request, 'listes/prof_cursus_etudiant.html',{'user': user,'cours':cours, 'etu': etu, "cursus": zip(cursusEtu, filiereEtu)})
 
 
 def admin_cours(request, user_id):
