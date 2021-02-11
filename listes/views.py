@@ -627,5 +627,5 @@ def admin_supprimer_etudiant(request, user_id, etu_id):
 
     form = DocumentForm()
 
-    return render(request, 'listes/admin_etudiant.html', {'user': admin, 'form': form, "data": list(etudiant_all)})
+    return admin_etudiant(request, user_id)
 
