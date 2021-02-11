@@ -126,3 +126,19 @@ class Document(models.Model):
     docfile = models.FileField(upload_to='documents/%Y/%m/%d')
 
 
+class Cursus(models.Model):
+    etudiants = models.ManyToManyField(Cours)
+    debut = models.DateField(default=None)
+    fin = models.DateField(default=None)
+    filiere = models.ForeignKey(Filiere, on_delete=models.CASCADE, default=None)
+    niveaux = ListCharField(
+        base_field=models.CharField(
+            max_length=10,
+            choices=Niveau.choices,
+            default=Niveau.L1,
+        ),
+        size=2,
+        max_length=(2 * 11),
+        default=None
+    )
+    etablissement = models.CharField(max_length=100, default=None)
