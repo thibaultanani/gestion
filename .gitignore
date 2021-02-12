@@ -2,7 +2,6 @@
 static/node_modules/*
 static/admin/*
 .vagrant/*
-.idea/*
 Vagrantfile
 ubuntu-xenial-16.04-cloudimg-console
 __pycache__/*
